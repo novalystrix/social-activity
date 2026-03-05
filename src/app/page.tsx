@@ -58,8 +58,8 @@ export default function DashboardPage() {
   const stats = getStats();
 
   const timeline = [
-    ...stats.recentPosts.map(p => ({ id: `p-${p.id}`, type: 'post' as const, platform: p.platform, text: p.text, date: p.created_at, status: p.status })),
-    ...stats.recentEngagements.map(e => ({ id: `e-${e.id}`, type: 'engagement' as const, platform: e.platform, text: e.my_text || `${e.engagement_type} on ${e.target_author}`, date: e.created_at, status: null })),
+    ...stats.recentPosts.map(p => ({ id: `p-${p.id}`, type: 'post' as const, platform: p.platform, text: p.text, date: p.created_at, status: p.status, url: p.url || null })),
+    ...stats.recentEngagements.map(e => ({ id: `e-${e.id}`, type: 'engagement' as const, platform: e.platform, text: e.my_text || `${e.engagement_type} on ${e.target_author}`, date: e.created_at, status: null, url: e.target_url || null })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 15);
 
   return (
@@ -155,6 +155,9 @@ export default function DashboardPage() {
                 {item.type}
               </span>
               <p className="text-sm text-zinc-300 flex-1 truncate">{item.text}</p>
+              {item.url && (
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] text-sm shrink-0" title="View on platform">↗</a>
+              )}
               <span className="text-xs text-zinc-500 shrink-0">{formatDate(item.date)}</span>
             </div>
           ))}
