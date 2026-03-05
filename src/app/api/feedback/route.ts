@@ -29,16 +29,16 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { post_id, author, text } = body;
+    const { post_id, author, author_image, text } = body;
 
     if (!author || !text) {
       return NextResponse.json({ error: 'author and text are required' }, { status: 400 });
     }
 
     const result = db().prepare(`
-      INSERT INTO feedback (post_id, author, text, status)
-      VALUES (?, ?, ?, 'pending')
-    `).run(post_id || null, author, text);
+      INSERT INTO feedback (post_id, author, author_image, text, status)
+      VALUES (?, ?, ?, ?, 'pending')
+    `).run(post_id || null, author, author_image || null, text);
 
     const feedback = db().prepare('SELECT * FROM feedback WHERE id = ?').get(result.lastInsertRowid) as Feedback;
     return NextResponse.json({ feedback }, { status: 201 });
