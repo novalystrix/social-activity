@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: social-activity
+    runtime: node
+    buildCommand: npm install && npm run seed && npm run build
+    startCommand: npm start
+    envVars:
+      - key: APP_PASSWORD
+        sync: false
+      - key: NODE_ENV
+        value: production
+    disk:
+      name: data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
