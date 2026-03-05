@@ -92,7 +92,7 @@ function initSchema(db: Database.Database) {
 
   // Seed default admin users
   const seedUsers = [
-    { email: 'roy@monday.com', name: 'Roy', role: 'admin' },
+    { email: 'vaselin@gmail.com', name: 'Roy', role: 'admin' },
     { email: 'novalystrix@gmail.com', name: 'Novalystrix', role: 'admin' },
   ];
   const insertUser = db.prepare(
