@@ -26,7 +26,7 @@ export default function PinButton({ item }: { item: PinnedItem }) {
     <button
       onClick={handleClick}
       title="Pin to chat"
-      className={`text-sm opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110 ${
+      className={`text-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:bg-[#4FC3F7]/10 px-3 py-2 rounded-lg cursor-pointer ${
         pulsing ? 'animate-pulse scale-125' : ''
       }`}
     >

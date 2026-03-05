@@ -53,7 +53,7 @@ export default function PostsPage() {
               <PostTypeBadge type={post.post_type} />
               <PinButton item={{ type: 'post', id: post.id, snippet: post.text.slice(0, 80) }} />
               {post.url && (
-                <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] text-sm" title="View on platform">↗</a>
+                <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] hover:bg-[#4FC3F7]/10 text-base font-bold px-3 py-2 rounded-lg transition-colors" title="View on platform">↗</a>
               )}
               <span className="text-xs text-zinc-500 ml-auto">{formatDate(post.created_at)}</span>
             </div>

@@ -46,7 +46,7 @@ export default function EngagementPage() {
                 {eng.engagement_type}
               </span>
               {eng.target_url && (
-                <a href={eng.target_url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] text-sm" title="View on platform">↗</a>
+                <a href={eng.target_url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] hover:bg-[#4FC3F7]/10 text-base font-bold px-3 py-2 rounded-lg transition-colors" title="View on platform">↗</a>
               )}
               {eng.target_author && (
                 <span className="text-xs text-zinc-400">on <span className="text-white font-medium">{eng.target_author}</span></span>

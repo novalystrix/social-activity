@@ -156,7 +156,7 @@ export default function DashboardPage() {
               </span>
               <p className="text-sm text-zinc-300 flex-1 truncate">{item.text}</p>
               {item.url && (
-                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] text-sm shrink-0" title="View on platform">↗</a>
+                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] hover:bg-[#4FC3F7]/10 text-base font-bold shrink-0 px-3 py-2 rounded-lg transition-colors" title="View on platform">↗</a>
               )}
               <span className="text-xs text-zinc-500 shrink-0">{formatDate(item.date)}</span>
             </div>
