@@ -76,6 +76,9 @@ function initSchema(db: Database.Database) {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
       author TEXT,
+      author_email TEXT,
+      author_name TEXT,
+      author_image TEXT,
       message TEXT NOT NULL,
       pinned_items TEXT,
       created_at TEXT DEFAULT (datetime('now'))
@@ -89,6 +92,17 @@ function initSchema(db: Database.Database) {
       created_at TEXT DEFAULT (datetime('now'))
     );
   `);
+
+  // Migrate existing tables to add new columns if they don't exist
+  const migrations = [
+    'ALTER TABLE chat_messages ADD COLUMN author_email TEXT',
+    'ALTER TABLE chat_messages ADD COLUMN author_name TEXT',
+    'ALTER TABLE chat_messages ADD COLUMN author_image TEXT',
+    'ALTER TABLE feedback ADD COLUMN author_image TEXT',
+  ];
+  for (const sql of migrations) {
+    try { db.exec(sql); } catch { /* column already exists */ }
+  }
 
   // Seed default admin users
   const seedUsers = [

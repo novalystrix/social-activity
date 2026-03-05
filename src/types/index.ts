@@ -34,6 +34,7 @@ export interface Feedback {
   id: number;
   post_id: number | null;
   author: string;
+  author_image: string | null;
   text: string;
   status: FeedbackStatus;
   nova_response: string | null;
