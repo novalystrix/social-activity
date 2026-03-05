@@ -45,6 +45,9 @@ export default function EngagementPage() {
               <span className={`text-xs px-2 py-0.5 rounded-full ${typeStyles[eng.engagement_type] || 'bg-zinc-700 text-zinc-400'}`}>
                 {eng.engagement_type}
               </span>
+              {eng.target_url && (
+                <a href={eng.target_url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] text-sm" title="View on platform">↗</a>
+              )}
               {eng.target_author && (
                 <span className="text-xs text-zinc-400">on <span className="text-white font-medium">{eng.target_author}</span></span>
               )}

@@ -5,7 +5,13 @@ services:
     buildCommand: npm install && npm run seed && npm run build
     startCommand: npm start
     envVars:
-      - key: APP_PASSWORD
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: NEXTAUTH_SECRET
+        sync: false
+      - key: NEXTAUTH_URL
         sync: false
       - key: NODE_ENV
         value: production

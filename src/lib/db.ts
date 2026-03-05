@@ -80,7 +80,27 @@ function initSchema(db: Database.Database) {
       pinned_items TEXT,
       created_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS allowed_users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      name TEXT,
+      role TEXT DEFAULT 'viewer' CHECK (role IN ('admin', 'viewer')),
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
+
+  // Seed default admin users
+  const seedUsers = [
+    { email: 'roy@monday.com', name: 'Roy', role: 'admin' },
+    { email: 'novalystrix@gmail.com', name: 'Novalystrix', role: 'admin' },
+  ];
+  const insertUser = db.prepare(
+    'INSERT OR IGNORE INTO allowed_users (email, name, role) VALUES (?, ?, ?)'
+  );
+  for (const u of seedUsers) {
+    insertUser.run(u.email, u.name, u.role);
+  }
 }
 
 let _db: Database.Database | null = null;

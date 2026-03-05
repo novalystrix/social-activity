@@ -11,6 +11,7 @@ const links = [
   { href: '/corpus', label: 'Corpus', icon: '\u2630' },
   { href: '/strategy', label: 'Strategy', icon: '\u2699' },
   { href: '/feedback', label: 'Feedback', icon: '\u2709' },
+  { href: '/admin', label: 'Admin', icon: '\u2691' },
 ];
 
 export default function Nav() {
