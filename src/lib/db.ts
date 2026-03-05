@@ -94,6 +94,9 @@ function initSchema(db: Database.Database) {
   const seedUsers = [
     { email: 'vaselin@gmail.com', name: 'Roy', role: 'admin' },
     { email: 'novalystrix@gmail.com', name: 'Novalystrix', role: 'admin' },
+    { email: 'guyre@monday.com', name: 'Guy Regev', role: 'viewer' },
+    { email: 'bridieca@monday.com', name: 'Bridie Castiel', role: 'viewer' },
+    { email: 'oran@monday.com', name: 'Oran', role: 'viewer' },
   ];
   const insertUser = db.prepare(
     'INSERT OR REPLACE INTO allowed_users (email, name, role) VALUES (?, ?, ?)'
