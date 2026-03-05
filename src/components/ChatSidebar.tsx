@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import ChatMessage from './ChatMessage';
 import PinnedItemCard from './PinnedItemCard';
 import type { PinnedItem } from './PinButton';
@@ -9,16 +10,19 @@ interface ChatMsg {
   id: number;
   role: string;
   author: string | null;
+  author_email: string | null;
+  author_name: string | null;
+  author_image: string | null;
   message: string;
   pinned_items: string | null;
   created_at: string;
 }
 
 export default function ChatSidebar() {
+  const { data: session } = useSession();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState('');
-  const [author, setAuthor] = useState('Roy');
   const [pinned, setPinned] = useState<PinnedItem[]>([]);
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -72,7 +76,9 @@ export default function ChatSidebar() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          author,
+          author_name: session?.user?.name || null,
+          author_email: session?.user?.email || null,
+          author_image: session?.user?.image || null,
           message: input.trim(),
           pinned_items: pinned.length > 0 ? pinned : undefined,
         }),
@@ -143,15 +149,19 @@ export default function ChatSidebar() {
 
       {/* Input */}
       <div className="px-3 py-3 border-t border-zinc-800 space-y-2">
+        {session?.user && (
+          <div className="flex items-center gap-2 mb-1">
+            {session.user.image ? (
+              <img src={session.user.image} alt={session.user.name || ''} className="w-5 h-5 rounded-full object-cover" />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[9px] font-medium text-zinc-300">
+                {session.user.name?.charAt(0).toUpperCase() || '?'}
+              </div>
+            )}
+            <span className="text-xs text-zinc-400">{session.user.name}</span>
+          </div>
+        )}
         <div className="flex gap-2">
-          <select
-            value={author}
-            onChange={e => setAuthor(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-300 focus:border-[#4FC3F7] focus:outline-none"
-          >
-            <option value="Roy">Roy</option>
-            <option value="Bridie">Bridie</option>
-          </select>
           <textarea
             value={input}
             onChange={e => setInput(e.target.value)}
