@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import PinButton from '@/components/PinButton';
 
 interface Feedback {
   id: number;
@@ -89,9 +90,10 @@ export default function FeedbackPage() {
 
       <div className="space-y-3">
         {feedback.map((f) => (
-          <div key={f.id} className="p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
+          <div key={f.id} className="group p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-sm font-semibold text-[#4FC3F7]">{f.author}</span>
+              <PinButton item={{ type: 'feedback', id: f.id, snippet: f.text.slice(0, 80) }} />
               {f.post_id && <span className="text-xs text-zinc-500">on post #{f.post_id}</span>}
               <span className={`text-xs px-2 py-0.5 rounded-full ml-auto ${
                 f.status === 'pending' ? 'bg-amber-500/10 text-amber-400' : 'bg-emerald-500/10 text-emerald-400'

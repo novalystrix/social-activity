@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import PlatformBadge from '@/components/PlatformBadge';
 import StatusBadge from '@/components/StatusBadge';
 import PostTypeBadge from '@/components/PostTypeBadge';
+import PinButton from '@/components/PinButton';
 import type { Post, Feedback } from '@/types';
 
 function getPosts() {
@@ -45,11 +46,12 @@ export default function PostsPage() {
 
       <div className="space-y-4">
         {posts.map((post) => (
-          <div key={post.id} className="p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
+          <div key={post.id} className="group p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors relative">
             <div className="flex items-center gap-2 flex-wrap mb-3">
               <PlatformBadge platform={post.platform} />
               <StatusBadge status={post.status} />
               <PostTypeBadge type={post.post_type} />
+              <PinButton item={{ type: 'post', id: post.id, snippet: post.text.slice(0, 80) }} />
               <span className="text-xs text-zinc-500 ml-auto">{formatDate(post.created_at)}</span>
             </div>
 

@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import PlatformBadge from '@/components/PlatformBadge';
+import PinButton from '@/components/PinButton';
 import type { Engagement } from '@/types';
 
 function getEngagements() {
@@ -37,9 +38,10 @@ export default function EngagementPage() {
 
       <div className="space-y-3">
         {engagements.map((eng) => (
-          <div key={eng.id} className="p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
+          <div key={eng.id} className="group p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
             <div className="flex items-center gap-2 flex-wrap mb-3">
               <PlatformBadge platform={eng.platform} />
+              <PinButton item={{ type: 'engagement', id: eng.id, snippet: (eng.my_text || eng.target_author || 'Engagement').slice(0, 80) }} />
               <span className={`text-xs px-2 py-0.5 rounded-full ${typeStyles[eng.engagement_type] || 'bg-zinc-700 text-zinc-400'}`}>
                 {eng.engagement_type}
               </span>

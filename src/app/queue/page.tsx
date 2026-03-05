@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import PinButton from '@/components/PinButton';
 import type { Post } from '@/types';
 
 function formatDate(dateStr: string) {
@@ -40,8 +41,9 @@ export default function QueuePage() {
 
       <div className="space-y-4">
         {posts.map((post) => (
-          <div key={post.id} className="p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
+          <div key={post.id} className="group p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
             <div className="flex items-center gap-2 flex-wrap mb-3">
+              <PinButton item={{ type: 'post', id: post.id, snippet: post.text.slice(0, 80) }} />
               <span className={`text-xs px-2 py-0.5 rounded-full ${post.platform === 'twitter' ? 'bg-sky-500/10 text-sky-400' : 'bg-blue-600/10 text-blue-400'}`}>
                 {post.platform === 'twitter' ? 'X Twitter' : 'in LinkedIn'}
               </span>

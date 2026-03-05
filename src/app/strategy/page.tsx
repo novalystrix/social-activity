@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
+import PinButton from '@/components/PinButton';
 
 interface StrategyFile {
   id: number;
@@ -52,19 +53,23 @@ export default function StrategyPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
           {files.map((file) => (
-            <button
-              key={file.id}
-              onClick={() => selectFile(file.id)}
-              className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                selected?.id === file.id
-                  ? 'border-[#4FC3F7]/50 bg-[#4FC3F7]/5'
-                  : 'border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700'
-              }`}
-            >
-              <p className="text-sm font-medium text-white">{file.title}</p>
-              <p className="text-xs text-zinc-500 mt-1">{file.filename}</p>
-              <p className="text-xs text-zinc-600 mt-0.5">Updated: {new Date(file.updated_at).toLocaleDateString()}</p>
-            </button>
+            <div key={file.id} className="group relative">
+              <button
+                onClick={() => selectFile(file.id)}
+                className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                  selected?.id === file.id
+                    ? 'border-[#4FC3F7]/50 bg-[#4FC3F7]/5'
+                    : 'border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-white">{file.title}</p>
+                  <PinButton item={{ type: 'strategy', id: file.id, snippet: file.title }} />
+                </div>
+                <p className="text-xs text-zinc-500 mt-1">{file.filename}</p>
+                <p className="text-xs text-zinc-600 mt-0.5">Updated: {new Date(file.updated_at).toLocaleDateString()}</p>
+              </button>
+            </div>
           ))}
         </div>
 

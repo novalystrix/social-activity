@@ -71,6 +71,15 @@ function initSchema(db: Database.Database) {
       source_path TEXT NOT NULL,
       updated_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS chat_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+      author TEXT,
+      message TEXT NOT NULL,
+      pinned_items TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
   `);
 }
 
