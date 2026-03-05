@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import PinButton from '@/components/PinButton';
 
 interface Feedback {
   id: number;
   post_id: number | null;
   author: string;
+  author_image: string | null;
   text: string;
   status: string;
   nova_response: string | null;
@@ -17,9 +19,21 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+function Avatar({ name, image }: { name: string; image: string | null }) {
+  if (image) {
+    return <img src={image} alt={name} className="w-6 h-6 rounded-full object-cover flex-shrink-0" />;
+  }
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  return (
+    <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-medium text-zinc-300 flex-shrink-0">
+      {initials}
+    </div>
+  );
+}
+
 export default function FeedbackPage() {
+  const { data: session } = useSession();
   const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [author, setAuthor] = useState('Roy');
   const [text, setText] = useState('');
 
   async function loadFeedback() {
@@ -36,7 +50,11 @@ export default function FeedbackPage() {
     await fetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ author, text }),
+      body: JSON.stringify({
+        author: session?.user?.name || session?.user?.email || 'User',
+        author_image: session?.user?.image || null,
+        text,
+      }),
     });
     setText('');
     loadFeedback();
@@ -66,15 +84,19 @@ export default function FeedbackPage() {
 
       <form onSubmit={submitFeedback} className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-5 space-y-3">
         <h2 className="text-sm font-semibold text-white">New Feedback</h2>
+        {session?.user && (
+          <div className="flex items-center gap-2">
+            {session.user.image ? (
+              <img src={session.user.image} alt={session.user.name || ''} className="w-6 h-6 rounded-full object-cover" />
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-medium text-zinc-300">
+                {session.user.name?.charAt(0).toUpperCase() || '?'}
+              </div>
+            )}
+            <span className="text-sm text-zinc-400">{session.user.name}</span>
+          </div>
+        )}
         <div className="flex gap-3">
-          <select
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:border-[#4FC3F7] focus:outline-none"
-          >
-            <option value="Roy">Roy</option>
-            <option value="Bridie">Bridie</option>
-          </select>
           <input
             type="text"
             placeholder="Write feedback..."
@@ -92,6 +114,7 @@ export default function FeedbackPage() {
         {feedback.map((f) => (
           <div key={f.id} className="group p-5 rounded-xl border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
             <div className="flex items-center gap-2 mb-2">
+              <Avatar name={f.author} image={f.author_image} />
               <span className="text-sm font-semibold text-[#4FC3F7]">{f.author}</span>
               <PinButton item={{ type: 'feedback', id: f.id, snippet: f.text.slice(0, 80) }} />
               {f.post_id && <span className="text-xs text-zinc-500">on post #{f.post_id}</span>}
