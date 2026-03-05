@@ -96,7 +96,7 @@ function initSchema(db: Database.Database) {
     { email: 'novalystrix@gmail.com', name: 'Novalystrix', role: 'admin' },
   ];
   const insertUser = db.prepare(
-    'INSERT OR IGNORE INTO allowed_users (email, name, role) VALUES (?, ?, ?)'
+    'INSERT OR REPLACE INTO allowed_users (email, name, role) VALUES (?, ?, ?)'
   );
   for (const u of seedUsers) {
     insertUser.run(u.email, u.name, u.role);
