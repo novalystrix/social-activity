@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow auth-related routes and static assets
+  // Allow public routes and static assets
   if (
+    pathname === '/' ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon') ||
     pathname === '/favicon.ico'
   ) {
     return NextResponse.next();
@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
 
   if (!token) {
     const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
