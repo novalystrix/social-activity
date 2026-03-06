@@ -20,7 +20,7 @@ export default async function AccountsPage() {
     },
   });
 
-  const accounts = user?.memberships.map((m) => ({
+  const accounts = user?.memberships.map((m: any) => ({
     id: m.account.id,
     name: m.account.name,
     slug: m.account.slug,
