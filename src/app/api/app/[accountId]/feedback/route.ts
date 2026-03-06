@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext } from '@/lib/apiAuth';
 import prisma from '@/lib/prisma';

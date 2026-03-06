@@ -7,11 +7,15 @@ declare global {
 }
 
 function createPrismaClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  if (!process.env.DATABASE_URL) {
+    // During build time, return a dummy client that won't connect
+    return new PrismaClient() as any;
+  }
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
   return new PrismaClient({ adapter } as any);
 }
 
-const prisma = global._prisma ?? createPrismaClient();
+const prisma: PrismaClient = global._prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== 'production') {
   global._prisma = prisma;
