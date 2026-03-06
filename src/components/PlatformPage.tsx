@@ -126,9 +126,21 @@ export default function PlatformPage({ platform, metrics, posts, replies, newFol
                 )}
               </div>
               <div className="flex items-center gap-4 text-xs text-zinc-500">
-                <span className={`px-2 py-0.5 rounded-full ${colorClass} bg-current/10`} style={{ backgroundColor: 'currentColor' }}>
-                  <span className={colorClass}>{post.postType}</span>
-                </span>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    post.postType === 'original' ? 'bg-emerald-500/15 text-emerald-400' :
+                    post.postType === 'philosophy' ? 'bg-purple-500/15 text-purple-400' :
+                    post.postType === 'story' ? 'bg-amber-500/15 text-amber-400' :
+                    post.postType === 'reaction' ? 'bg-rose-500/15 text-rose-400' :
+                    post.postType === 'advancement' ? 'bg-cyan-500/15 text-cyan-400' :
+                    'bg-zinc-500/15 text-zinc-400'
+                  }`}>{post.postType}</span>
+                {post.status !== 'published' && (
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    post.status === 'draft' ? 'bg-yellow-500/15 text-yellow-400' :
+                    post.status === 'approved' ? 'bg-green-500/15 text-green-400' :
+                    'bg-zinc-500/15 text-zinc-400'
+                  }`}>{post.status}</span>
+                )}
                 <span>{post.likes} likes</span>
                 <span>{post.comments} comments</span>
                 <span>{post.reposts} reposts</span>
