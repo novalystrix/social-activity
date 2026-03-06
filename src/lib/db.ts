@@ -72,16 +72,7 @@ function initSchema(db: Database.Database) {
       updated_at TEXT DEFAULT (datetime('now'))
     );
 
-    CREATE TABLE IF NOT EXISTS personality (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      section TEXT NOT NULL,
-      platform TEXT NOT NULL DEFAULT 'all',
-      content TEXT NOT NULL,
-      updated_at TEXT DEFAULT (datetime('now')),
-      UNIQUE(section, platform)
-    );
-
-        CREATE TABLE IF NOT EXISTS chat_messages (
+    CREATE TABLE IF NOT EXISTS chat_messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
       author TEXT,
