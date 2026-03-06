@@ -12,10 +12,11 @@ export async function GET(req: NextRequest, { params }: Ctx) {
 
   const url = new URL(req.url);
   const platform = url.searchParams.get('platform') || undefined;
+  const status = url.searchParams.get('status') || undefined;
   const limit = parseInt(url.searchParams.get('limit') || '50');
 
   const posts = await prisma.post.findMany({
-    where: { accountId, ...(platform ? { platform } : {}) },
+    where: { accountId, ...(platform ? { platform } : {}), ...(status ? { status } : {}) },
     orderBy: { createdAt: 'desc' },
     take: limit,
   });
@@ -40,7 +41,8 @@ export async function POST(req: NextRequest, { params }: Ctx) {
       comments: body.comments || 0,
       reposts: body.reposts || 0,
       impressions: body.impressions || 0,
-      publishedAt: body.publishedAt ? new Date(body.publishedAt) : new Date(),
+      scheduledFor: body.scheduledFor ? new Date(body.scheduledFor) : null,
+      publishedAt: body.scheduledFor ? null : (body.publishedAt ? new Date(body.publishedAt) : new Date()),
     },
   });
   return NextResponse.json(post, { status: 201 });

@@ -62,7 +62,8 @@ model Post {
   comments    Int        @default(0)
   reposts     Int        @default(0)
   impressions Int        @default(0)
-  publishedAt DateTime?
+  scheduledFor DateTime?
+  publishedAt  DateTime?
   createdAt   DateTime   @default(now())
   feedback    Feedback[]
 }
