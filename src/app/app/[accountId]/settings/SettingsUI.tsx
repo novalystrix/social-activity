@@ -226,3 +226,4 @@ export default function SettingsUI({ accountId, initialAccount, initialMembers }
     </div>
   );
 }
+// Note: API Keys section is added via ApiKeysSection component below

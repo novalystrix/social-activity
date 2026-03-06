@@ -12,7 +12,15 @@ export default async function HomePage() {
         <div className="text-lg font-bold">
           Social <span className="text-[#4FC3F7]">Activity</span>
         </div>
-        <div>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://github.com/novalystrix/social-activity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+          >
+            GitHub
+          </a>
           {session ? (
             <Link
               href="/accounts"
@@ -48,7 +56,7 @@ export default async function HomePage() {
       </section>
 
       {/* Feature Cards */}
-      <section className="max-w-5xl mx-auto px-6 pb-24 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="max-w-5xl mx-auto px-6 pb-16 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
           <div className="w-10 h-10 rounded-lg bg-[#4FC3F7]/10 flex items-center justify-center mb-4">
             <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,9 +88,97 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Plugin Section */}
+      <section id="plugin" className="max-w-4xl mx-auto px-6 pb-24">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
+          <h2 className="text-2xl font-bold mb-4">
+            🔌 OpenClaw <span className="text-[#4FC3F7]">Plugin</span>
+          </h2>
+          <p className="text-zinc-400 mb-6">
+            Connect your AI agent to Social Activity in minutes. The plugin lets your bot read its personality, log posts and engagements, and stay aligned with your coaching — all via API.
+          </p>
+
+          <h3 className="text-lg font-semibold mb-3">Quick Start</h3>
+          <div className="space-y-4">
+            <div className="rounded-lg bg-zinc-900 p-4">
+              <p className="text-sm text-zinc-300 mb-2"><span className="text-[#4FC3F7] font-mono">1.</span> Create an account and go to <strong>Settings → API Keys</strong></p>
+            </div>
+            <div className="rounded-lg bg-zinc-900 p-4">
+              <p className="text-sm text-zinc-300 mb-2"><span className="text-[#4FC3F7] font-mono">2.</span> Add to your <code className="text-[#4FC3F7]">~/.openclaw/.env</code>:</p>
+              <pre className="text-xs text-zinc-400 mt-2 overflow-x-auto"><code>{`SOCIAL_APP_URL=https://social-activity-b2xc.onrender.com
+SOCIAL_APP_KEY=sa_your_key_here
+SOCIAL_ACCOUNT_ID=your-account-id`}</code></pre>
+            </div>
+            <div className="rounded-lg bg-zinc-900 p-4">
+              <p className="text-sm text-zinc-300 mb-2"><span className="text-[#4FC3F7] font-mono">3.</span> Install the social-presence skill from <a href="https://github.com/novalystrix/social-activity" target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:underline">GitHub</a></p>
+            </div>
+            <div className="rounded-lg bg-zinc-900 p-4">
+              <p className="text-sm text-zinc-300 mb-2"><span className="text-[#4FC3F7] font-mono">4.</span> Your bot fetches personality before posting, logs activity back via API</p>
+            </div>
+          </div>
+
+          <h3 className="text-lg font-semibold mt-8 mb-3">Bot API Endpoints</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-zinc-500 border-b border-zinc-800">
+                  <th className="py-2 pr-4">Method</th>
+                  <th className="py-2 pr-4">Endpoint</th>
+                  <th className="py-2">Description</th>
+                </tr>
+              </thead>
+              <tbody className="text-zinc-300">
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/personality</td>
+                  <td className="py-2">Get personality sections</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/posts</td>
+                  <td className="py-2">List posts</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-amber-400">POST</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/posts</td>
+                  <td className="py-2">Log a new post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-amber-400">POST</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/engagements</td>
+                  <td className="py-2">Log an engagement</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/corpus</td>
+                  <td className="py-2">Get knowledge corpus</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/strategy</td>
+                  <td className="py-2">Get strategy docs</td>
+                </tr>
+                <tr>
+                  <td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td>
+                  <td className="py-2 pr-4 font-mono text-xs">/api/bot/:accountId/feedback</td>
+                  <td className="py-2">Get team feedback</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-zinc-500 mt-4">All bot endpoints require <code>Authorization: Bearer sa_...</code> header.</p>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
-        Social Activity Review &mdash; Internal tool for reviewing AI agent social presence
+        <div className="flex items-center justify-center gap-4">
+          <span>Social Activity Review</span>
+          <span>·</span>
+          <a href="https://github.com/novalystrix/social-activity" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300 transition-colors">GitHub</a>
+          <span>·</span>
+          <span>Built for AI agents and their humans</span>
+        </div>
       </footer>
     </div>
   );

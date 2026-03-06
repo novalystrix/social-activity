@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import prisma from '@/lib/prisma';
 import SettingsUI from './SettingsUI';
+import ApiKeysSection from './ApiKeysSection';
 
 interface Props {
   params: Promise<{ accountId: string }>;
@@ -39,6 +40,7 @@ export default async function SettingsPage({ params }: Props) {
           user: m.user,
         }))}
       />
+      <ApiKeysSection accountId={accountId} />
     </div>
   );
 }

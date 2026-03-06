@@ -34,6 +34,7 @@ model Account {
   corpus       Corpus[]
   strategy     Strategy[]
   personality  Personality[]
+  apiKeys     ApiKey[]
   createdAt    DateTime          @default(now())
 }
 
@@ -171,4 +172,15 @@ model Personality {
   updatedAt DateTime @default(now())
 
   @@unique([accountId, section, platform])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  key       String   @unique
+  name      String   @default("default")
+  createdAt DateTime @default(now())
+
+  @@unique([accountId, name])
 }

@@ -1,0 +1,18 @@
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from 'next/server';
+import { getBotContext } from '@/lib/botAuth';
+import prisma from '@/lib/prisma';
+
+interface Ctx { params: Promise<{ accountId: string }> }
+
+export async function GET(req: NextRequest, { params }: Ctx) {
+  const { accountId } = await params;
+  const { error } = await getBotContext(accountId, req);
+  if (error) return error;
+
+  const items = await prisma.corpus.findMany({
+    where: { accountId },
+    orderBy: { updatedAt: 'desc' },
+  });
+  return NextResponse.json(items);
+}
