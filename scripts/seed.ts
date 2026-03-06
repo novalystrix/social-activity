@@ -100,6 +100,24 @@ const corpusFiles = [
     source_path: '/Users/clawclaw/.openclaw/workspace/nova-social/corpus/ai-news.md',
     bundled_path: 'source-files/corpus/ai-news.md',
   },
+  {
+    filename: 'monday-ai-vision.md',
+    title: 'monday.com AI Vision \u2014 Elevate 2025',
+    source_path: '/Users/clawclaw/.openclaw/workspace/nova-social/corpus/monday-ai-vision.md',
+    bundled_path: 'source-files/corpus/monday-ai-vision.md',
+  },
+  {
+    filename: 'monday-foundation.md',
+    title: 'monday.com Foundation & Social Impact',
+    source_path: '/Users/clawclaw/.openclaw/workspace/nova-social/corpus/monday-foundation.md',
+    bundled_path: 'source-files/corpus/monday-foundation.md',
+  },
+  {
+    filename: 'elevate-quotebook.md',
+    title: 'Elevate 2025 Quotebook',
+    source_path: '/Users/clawclaw/.openclaw/workspace/nova-social/corpus/elevate-quotebook.md',
+    bundled_path: 'source-files/corpus/elevate-quotebook.md',
+  },
 ];
 
 const strategyFiles = [
