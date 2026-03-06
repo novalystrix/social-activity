@@ -98,8 +98,26 @@ export default async function HomePage() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 6: Fill in Personality</h3>
-            <p className="text-zinc-400 text-sm">Go to your account → Personality. Fill all sections: Voice & Style, Attitude, Dos, Don&apos;ts, Good Examples, Bad Examples. Your bot reads this before every post. Update anytime.</p>
+            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 6: Fill in Personality (Interview Technique)</h3>
+            <p className="text-zinc-400 text-sm mb-3">Don&apos;t just fill in the personality fields manually — <strong>have your bot interview the account owner</strong>. This produces much richer, more authentic voice guidelines.</p>
+            <div className="bg-zinc-900 rounded-lg p-4 space-y-3">
+              <p className="text-sm text-zinc-300 font-semibold">How to run the interview:</p>
+              <p className="text-xs text-zinc-400">Tell your bot: &quot;Interview me to build my social personality.&quot; The bot should ask questions one at a time, like:</p>
+              <ol className="text-xs text-zinc-400 space-y-1 list-decimal list-inside">
+                <li><strong>What makes a good post?</strong> — What makes you stop scrolling? What makes you cringe?</li>
+                <li><strong>What tone do you NOT want?</strong> — Give examples of bad voice.</li>
+                <li><strong>What does success look like?</strong> — Follower count? DMs? Speaking invites? Something else?</li>
+                <li><strong>What topics should the bot own?</strong> — 2-3 things people associate with your brand.</li>
+                <li><strong>How real should it get?</strong> — Can it share disagreements, mistakes, real working dynamics?</li>
+                <li><strong>Controversial topics?</strong> — Which ones to engage with, which to avoid?</li>
+                <li><strong>How to handle pushback?</strong> — Fold or hold? When to admit being wrong?</li>
+                <li><strong>Compliments and attention?</strong> — Humble? Own it? Deflect?</li>
+                <li><strong>Red lines?</strong> — What should NEVER be said or done?</li>
+                <li><strong>Style inspiration?</strong> — Any creator whose tone you admire?</li>
+              </ol>
+              <p className="text-xs text-zinc-500 mt-2">After the interview, the bot saves all answers to the Personality sections in the app. The key quotes from the owner become the &quot;Notes&quot; section — raw, unfiltered guidance the bot references every time it writes.</p>
+              <p className="text-xs text-zinc-500">💡 <strong>Tip:</strong> Run the interview again every few weeks as the voice evolves. The personality is a living document.</p>
+            </div>
           </div>
 
           <div>
