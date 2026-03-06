@@ -9,9 +9,10 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get('error');
+  const callbackUrl = searchParams.get('callbackUrl') || '/accounts';
 
   useEffect(() => {
-    if (session) router.push('/');
+    if (session) router.push('/accounts');
   }, [session, router]);
 
   if (status === 'loading') {
@@ -27,23 +28,23 @@ function LoginContent() {
       <div className="w-full max-w-sm p-8 rounded-xl border border-zinc-800 bg-[#1a1a2e] text-center space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-white">
-            <span className="text-[#4FC3F7]">Nova</span>lystrix
+            Social <span className="text-[#4FC3F7]">Activity</span>
           </h1>
-          <p className="text-xs text-zinc-500 mt-1">Social Activity Dashboard</p>
+          <p className="text-xs text-zinc-500 mt-1">Review your AI agent&apos;s social presence</p>
         </div>
 
         {error && (
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
             <p className="text-sm text-red-400">
               {error === 'AccessDenied'
-                ? 'Access denied — your email is not on the allowlist. Contact an admin.'
+                ? 'Access denied. Please try again.'
                 : 'Sign in failed. Please try again.'}
             </p>
           </div>
         )}
 
         <button
-          onClick={() => signIn('google', { callbackUrl: '/' })}
+          onClick={() => signIn('google', { callbackUrl })}
           className="w-full px-4 py-3 bg-white text-black text-sm font-medium rounded-lg hover:bg-zinc-200 transition-colors flex items-center justify-center gap-3"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">

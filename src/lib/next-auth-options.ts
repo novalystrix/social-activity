@@ -1,6 +1,6 @@
 import type { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
-import { isAllowedUser, getUserRole } from './auth';
+import prisma from './prisma';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,12 +12,23 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user }) {
       if (!user.email) return false;
-      return isAllowedUser(user.email);
+      // Upsert user in our DB
+      await prisma.user.upsert({
+        where: { email: user.email },
+        update: { name: user.name, image: user.image },
+        create: { email: user.email, name: user.name, image: user.image },
+      });
+      return true;
     },
-    async session({ session }) {
+    async session({ session, token }) {
       if (session.user?.email) {
-        const role = getUserRole(session.user.email);
-        (session as any).role = role;
+        const dbUser = await prisma.user.findUnique({
+          where: { email: session.user.email },
+          select: { id: true },
+        });
+        if (dbUser) {
+          (session.user as any).id = dbUser.id;
+        }
       }
       return session;
     },

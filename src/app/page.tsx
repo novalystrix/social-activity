@@ -1,168 +1,89 @@
-import { db } from '@/lib/db';
-import StatCard from '@/components/StatCard';
-import PlatformBadge from '@/components/PlatformBadge';
-import StatusBadge from '@/components/StatusBadge';
-import type { Post, Engagement } from '@/types';
+import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/next-auth-options';
 
-function getStats() {
-  const database = db();
-
-  const totalPosts = (database.prepare('SELECT COUNT(*) as c FROM posts').get() as { c: number }).c;
-  const totalEngagements = (database.prepare('SELECT COUNT(*) as c FROM engagements').get() as { c: number }).c;
-  const connections = (database.prepare("SELECT COUNT(*) as c FROM engagements WHERE engagement_type = 'connection'").get() as { c: number }).c;
-  const pendingFeedback = (database.prepare("SELECT COUNT(*) as c FROM feedback WHERE status = 'pending'").get() as { c: number }).c;
-
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const weekActivity = (database.prepare('SELECT COUNT(*) as c FROM posts WHERE created_at >= ?').get(weekAgo) as { c: number }).c;
-
-  const twitterStats = database.prepare(`
-    SELECT
-      COUNT(CASE WHEN status = 'published' THEN 1 END) as published,
-      COALESCE(SUM(likes), 0) as likes,
-      COALESCE(SUM(comments_count), 0) as comments,
-      COALESCE(SUM(reposts), 0) as reposts
-    FROM posts WHERE platform = 'twitter'
-  `).get() as { published: number; likes: number; comments: number; reposts: number };
-
-  const linkedinStats = database.prepare(`
-    SELECT
-      COUNT(CASE WHEN status = 'published' THEN 1 END) as published,
-      COALESCE(SUM(likes), 0) as likes,
-      COALESCE(SUM(comments_count), 0) as comments,
-      COALESCE(SUM(reposts), 0) as reposts
-    FROM posts WHERE platform = 'linkedin'
-  `).get() as { published: number; likes: number; comments: number; reposts: number };
-
-  const recentPosts = database.prepare(
-    'SELECT * FROM posts ORDER BY created_at DESC LIMIT 8'
-  ).all() as Post[];
-
-  const recentEngagements = database.prepare(
-    'SELECT * FROM engagements ORDER BY created_at DESC LIMIT 7'
-  ).all() as Engagement[];
-
-  const scheduledPosts = database.prepare(
-    "SELECT * FROM posts WHERE status IN ('draft', 'approved') AND scheduled_for IS NOT NULL ORDER BY scheduled_for ASC LIMIT 5"
-  ).all() as Post[];
-
-  return { totalPosts, totalEngagements, connections, weekActivity, pendingFeedback, twitterStats, linkedinStats, recentPosts, recentEngagements, scheduledPosts };
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-  });
-}
-
-export default function DashboardPage() {
-  const stats = getStats();
-
-  const timeline = [
-    ...stats.recentPosts.map(p => ({ id: `p-${p.id}`, type: 'post' as const, platform: p.platform, text: p.text, date: p.created_at, status: p.status, url: p.url || null })),
-    ...stats.recentEngagements.map(e => ({ id: `e-${e.id}`, type: 'engagement' as const, platform: e.platform, text: e.my_text || `${e.engagement_type} on ${e.target_author}`, date: e.created_at, status: null, url: e.target_url || null })),
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 15);
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-zinc-400 text-sm mt-1">Novalystrix social activity overview</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <StatCard label="Total Posts" value={stats.totalPosts} accent />
-        <StatCard label="Comments Left" value={stats.totalEngagements} />
-        <StatCard label="Connections" value={stats.connections} />
-        <StatCard label="This Week" value={stats.weekActivity} />
-        <StatCard label="Pending Feedback" value={stats.pendingFeedback} sub="unread" />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-sky-400 font-bold text-lg">X</span>
-            <h2 className="text-white font-semibold">Twitter</h2>
-          </div>
-          <div className="grid grid-cols-4 gap-3 text-center">
-            <div>
-              <p className="text-2xl font-bold text-sky-400">{stats.twitterStats.published}</p>
-              <p className="text-xs text-zinc-500 mt-1">Published</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-sky-400">{stats.twitterStats.likes}</p>
-              <p className="text-xs text-zinc-500 mt-1">Likes</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-sky-400">{stats.twitterStats.comments}</p>
-              <p className="text-xs text-zinc-500 mt-1">Comments</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-sky-400">{stats.twitterStats.reposts}</p>
-              <p className="text-xs text-zinc-500 mt-1">Reposts</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
+      {/* Nav */}
+      <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
+        <div className="text-lg font-bold">
+          Social <span className="text-[#4FC3F7]">Activity</span>
         </div>
-
-        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-blue-400 font-bold text-lg">in</span>
-            <h2 className="text-white font-semibold">LinkedIn</h2>
-          </div>
-          <div className="grid grid-cols-4 gap-3 text-center">
-            <div>
-              <p className="text-2xl font-bold text-blue-400">{stats.linkedinStats.published}</p>
-              <p className="text-xs text-zinc-500 mt-1">Published</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-400">{stats.linkedinStats.likes}</p>
-              <p className="text-xs text-zinc-500 mt-1">Likes</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-400">{stats.linkedinStats.comments}</p>
-              <p className="text-xs text-zinc-500 mt-1">Comments</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-blue-400">{stats.linkedinStats.reposts}</p>
-              <p className="text-xs text-zinc-500 mt-1">Reposts</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {stats.scheduledPosts.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-white mb-3">Scheduled Posts</h2>
-          <div className="space-y-2">
-            {stats.scheduledPosts.map((post) => (
-              <div key={post.id} className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-[#1a1a2e]">
-                <PlatformBadge platform={post.platform} />
-                <StatusBadge status={post.status} />
-                <p className="text-sm text-zinc-300 truncate flex-1">{post.text}</p>
-                <span className="text-xs text-[#4FC3F7] shrink-0">{post.scheduled_for ? formatDate(post.scheduled_for) : ''}</span>
-              </div>
-            ))}
-          </div>
+          {session ? (
+            <Link
+              href="/accounts"
+              className="px-4 py-2 bg-[#4FC3F7] text-black text-sm font-medium rounded-lg hover:bg-[#4FC3F7]/90 transition-colors"
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="px-4 py-2 bg-[#4FC3F7] text-black text-sm font-medium rounded-lg hover:bg-[#4FC3F7]/90 transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
-      )}
+      </nav>
 
-      <div>
-        <h2 className="text-lg font-semibold text-white mb-3">Recent Activity</h2>
-        <div className="space-y-2">
-          {timeline.map((item) => (
-            <div key={item.id} className="flex items-start gap-3 p-3 rounded-lg border border-zinc-800 bg-[#1a1a2e] hover:border-zinc-700 transition-colors">
-              <PlatformBadge platform={item.platform} />
-              <span className={`text-xs px-2 py-0.5 rounded-full ${item.type === 'post' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-violet-500/10 text-violet-400'}`}>
-                {item.type}
-              </span>
-              <p className="text-sm text-zinc-300 flex-1 truncate">{item.text}</p>
-              {item.url && (
-                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-[#4FC3F7] hover:text-[#81D4FA] hover:bg-[#4FC3F7]/10 text-base font-bold shrink-0 px-3 py-2 rounded-lg transition-colors" title="View on platform">↗</a>
-              )}
-              <span className="text-xs text-zinc-500 shrink-0">{formatDate(item.date)}</span>
-            </div>
-          ))}
+      {/* Hero */}
+      <section className="max-w-4xl mx-auto px-6 py-24 text-center">
+        <h1 className="text-5xl font-bold mb-6">
+          Social Activity <span className="text-[#4FC3F7]">Review</span>
+        </h1>
+        <p className="text-xl text-zinc-400 mb-10 max-w-2xl mx-auto">
+          Review, coach, and improve your AI agent&apos;s social presence. Multi-platform analytics, team feedback, and content strategy in one place.
+        </p>
+        <Link
+          href={session ? '/accounts' : '/login'}
+          className="inline-flex items-center gap-2 px-8 py-4 bg-[#4FC3F7] text-black font-semibold rounded-lg hover:bg-[#4FC3F7]/90 transition-colors text-lg"
+        >
+          {session ? 'Go to Dashboard' : 'Get Started'}
+        </Link>
+      </section>
+
+      {/* Feature Cards */}
+      <section className="max-w-5xl mx-auto px-6 pb-24 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
+          <div className="w-10 h-10 rounded-lg bg-[#4FC3F7]/10 flex items-center justify-center mb-4">
+            <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Multi-Platform</h3>
+          <p className="text-zinc-400 text-sm">Track activity across Twitter and LinkedIn. Unified view of posts, replies, and follower growth.</p>
         </div>
-      </div>
+
+        <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
+          <div className="w-10 h-10 rounded-lg bg-[#4FC3F7]/10 flex items-center justify-center mb-4">
+            <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Analytics</h3>
+          <p className="text-zinc-400 text-sm">Follower growth, reach trends, engagement rates. Visual charts to understand what&apos;s working.</p>
+        </div>
+
+        <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e]">
+          <div className="w-10 h-10 rounded-lg bg-[#4FC3F7]/10 flex items-center justify-center mb-4">
+            <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Team Review</h3>
+          <p className="text-zinc-400 text-sm">Leave feedback on posts, chat with your team, and coach your agent to improve its social strategy.</p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
+        Social Activity Review &mdash; Internal tool for reviewing AI agent social presence
+      </footer>
     </div>
   );
 }

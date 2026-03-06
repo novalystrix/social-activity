@@ -1,29 +1,30 @@
-import { db } from './db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from './next-auth-options';
+import prisma from './prisma';
 
-export function isAllowedUser(email: string): boolean {
-  const row = db().prepare('SELECT id FROM allowed_users WHERE email = ?').get(email);
-  return !!row;
+export async function getSession() {
+  return getServerSession(authOptions);
 }
 
-export function getUserRole(email: string): string | null {
-  const row = db().prepare('SELECT role FROM allowed_users WHERE email = ?').get(email) as { role: string } | undefined;
-  return row?.role || null;
+export async function requireAuth() {
+  const session = await getSession();
+  if (!session?.user?.email) {
+    throw new Error('Unauthorized');
+  }
+  return session;
 }
 
-export function getAllowedUsers() {
-  return db().prepare('SELECT * FROM allowed_users ORDER BY created_at DESC').all() as {
-    id: number;
-    email: string;
-    name: string | null;
-    role: string;
-    created_at: string;
-  }[];
-}
+export async function requireAccountMember(accountId: string) {
+  const session = await requireAuth();
+  const userId = (session.user as any).id as string;
 
-export function addAllowedUser(email: string, name: string | null, role: string) {
-  db().prepare('INSERT OR IGNORE INTO allowed_users (email, name, role) VALUES (?, ?, ?)').run(email, name, role);
-}
+  const member = await prisma.accountMember.findUnique({
+    where: { accountId_userId: { accountId, userId } },
+  });
 
-export function removeAllowedUser(id: number) {
-  db().prepare('DELETE FROM allowed_users WHERE id = ?').run(id);
+  if (!member) {
+    throw new Error('Forbidden');
+  }
+
+  return { session, userId, role: member.role };
 }
