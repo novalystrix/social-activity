@@ -33,6 +33,7 @@ model Account {
   feedback     Feedback[]
   corpus       Corpus[]
   strategy     Strategy[]
+  personality  Personality[]
   createdAt    DateTime          @default(now())
 }
 
@@ -158,4 +159,16 @@ model Strategy {
   updatedAt DateTime @default(now())
 
   @@unique([accountId, filename])
+}
+
+model Personality {
+  id        String   @id @default(cuid())
+  account   Account  @relation(fields: [accountId], references: [id])
+  accountId String
+  section   String
+  platform  String   @default("all")
+  content   String
+  updatedAt DateTime @default(now())
+
+  @@unique([accountId, section, platform])
 }
