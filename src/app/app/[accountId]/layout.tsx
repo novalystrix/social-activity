@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/next-auth-options';
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import AppSidebar from '@/components/AppSidebar';
+import ChatSidebar from '@/components/ChatSidebar';
 
 interface Props {
   children: React.ReactNode;
@@ -47,6 +48,7 @@ export default async function AccountLayout({ children, params }: Props) {
           {children}
         </div>
       </main>
+      <ChatSidebar accountId={accountId} />
     </div>
   );
 }
