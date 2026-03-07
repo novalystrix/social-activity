@@ -126,7 +126,7 @@ export default function SettingsUI({ accountId, initialAccount, initialMembers }
           </label>
 
           <label className="block">
-            <span className="text-xs text-zinc-500 mb-1 block">Bot Name</span>
+            <span className="text-xs text-zinc-500 mb-1 block">Agent Name</span>
             <input
               value={account.botName || ''}
               onChange={(e) => setAccount({ ...account, botName: e.target.value })}
@@ -136,7 +136,7 @@ export default function SettingsUI({ accountId, initialAccount, initialMembers }
           </label>
 
           <label className="block">
-            <span className="text-xs text-zinc-500 mb-1 block">Bot Avatar URL</span>
+            <span className="text-xs text-zinc-500 mb-1 block">Agent Avatar URL</span>
             <input
               value={account.botAvatar || ''}
               onChange={(e) => setAccount({ ...account, botAvatar: e.target.value })}
