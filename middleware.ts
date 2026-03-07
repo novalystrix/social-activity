@@ -7,6 +7,7 @@ export async function middleware(request: NextRequest) {
   // Allow public routes, static assets, and bot API
   if (
     pathname === '/' ||
+    pathname.startsWith('/pricing') ||
     pathname.startsWith('/api/auth') ||
     pathname.startsWith('/api/bot') ||
     pathname.startsWith('/login') ||
