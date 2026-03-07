@@ -12,6 +12,8 @@ export default async function HomePage() {
     { name: 'social_get_strategy', desc: 'Get content strategy docs' },
     { name: 'social_log_post', desc: 'Log a published post' },
     { name: 'social_log_engagement', desc: 'Log a reply/comment/like' },
+    { name: 'social_queue_post', desc: 'Queue a post for future publishing' },
+    { name: 'social_publish_next', desc: 'Get next due post (for publish crons)' },
     { name: 'social_upsert_influencer', desc: 'Add/update influencer target' },
     { name: 'social_watch_status', desc: 'Twitter watcher status + new tweets' },
     { name: 'social_rate_check', desc: 'Check hourly action limits' },
@@ -19,14 +21,83 @@ export default async function HomePage() {
     { name: 'social_monday_sync', desc: 'Sync influencers from Monday.com' },
   ];
 
+  const checklist = [
+    'Agent can call social_get_personality and get back personality sections',
+    'Agent can call social_log_post and see it appear in the app',
+    'AI News scan cron runs daily and writes to plugin\'s data/trending-posts.md',
+    'LinkedIn/Twitter scan crons write to data/{platform}/ files',
+    'Content writer cron reads scan results and queues 6 posts per day (3 per platform)',
+    'Publish crons fire 3x/day per platform and actually post to social media',
+    'Posts appear in the app\'s Posts section with live URLs',
+    'Rate limiter prevents exceeding platform limits (LinkedIn: 30/hr, Twitter: 120/hr)',
+    'Personality interview has been completed (9 sections filled)',
+    'Team can give feedback on posts in the app',
+  ];
+
+  const debugItems = [
+    {
+      problem: 'Posts not appearing in app',
+      fix: 'Check if content writer cron is running (cron list). Verify social_queue_post is being called. Check the app\'s Posts page — if nothing there, the writer cron didn\'t run.',
+    },
+    {
+      problem: 'Scans failing / not writing files',
+      fix: 'Scan crons must write to ~/openclaw-social/data/ (plugin dir), NOT workspace files. Check file permissions. Verify the cron\'s write path matches where the content writer reads from.',
+    },
+    {
+      problem: 'Personality empty',
+      fix: 'Run the personality interview: tell your agent "Interview me to build my social personality." Go to app → Personality → fill all 9 sections.',
+    },
+    {
+      problem: 'Rate limit errors',
+      fix: 'Call social_rate_check before posting. LinkedIn: 30 actions/hr. Twitter: 120 actions/hr. Wait until next hour if limit hit.',
+    },
+    {
+      problem: 'Browser automation failing',
+      fix: 'Check if browser profile "openclaw" exists. Verify the agent is logged into Twitter/LinkedIn in that profile. Re-login manually if sessions expired.',
+    },
+    {
+      problem: 'Publish cron says "no post due"',
+      fix: 'Content writer didn\'t queue anything. Check if writer cron ran at 7 AM. Check social_publish_next manually. If queue is empty, trigger the content writer manually.',
+    },
+    {
+      problem: 'Engagement not logged',
+      fix: 'After EVERY comment/reply, call social_log_engagement. Check the app\'s Engagements page to verify. This is required — don\'t skip it.',
+    },
+  ];
+
+  const whyItems = [
+    {
+      title: 'Personality lives in the web app, not in files',
+      reason: 'Humans need to edit it through a UI, not YAML. It needs to be shared across sessions and accessible for team review. A database is the right home for something that evolves with coaching.',
+    },
+    {
+      title: 'Scan results live in plugin data files, not the web app',
+      reason: 'They\'re ephemeral — today\'s AI news, today\'s LinkedIn feed. They change daily and only the agent needs them. No reason to round-trip through Postgres for temporary working files.',
+    },
+    {
+      title: 'Write-then-publish pattern',
+      reason: 'The main agent has context (conversations, real experiences) but may not be available exactly at posting time. So it writes when it can, and a lightweight cron publishes on schedule. Decouples creativity from timing.',
+    },
+    {
+      title: 'Rate limiting is local (SQLite)',
+      reason: 'It needs to be fast and per-agent. If the web app is down, the agent should still respect rate limits. A local SQLite DB is the right call — no network dependency for a guard that must always work.',
+    },
+    {
+      title: 'Everything is logged to the web app',
+      reason: 'Posts, engagements, feedback — all of it. This is the human oversight layer. The owner should be able to see everything the agent did without asking. Logging is not optional.',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
         <div className="text-lg font-bold">Social <span className="text-[#4FC3F7]">Activity</span></div>
         <div className="flex items-center gap-4">
-          <a href="#plugin" className="text-sm text-zinc-400 hover:text-zinc-200">Plugin Setup</a>
-          <a href="#api" className="text-sm text-zinc-400 hover:text-zinc-200">API</a>
+          <a href="#bigpicture" className="text-sm text-zinc-400 hover:text-zinc-200">Overview</a>
+          <a href="#architecture" className="text-sm text-zinc-400 hover:text-zinc-200">Architecture</a>
+          <a href="#plugin" className="text-sm text-zinc-400 hover:text-zinc-200">Setup</a>
           <a href="#crons" className="text-sm text-zinc-400 hover:text-zinc-200">Crons</a>
+          <a href="#debug" className="text-sm text-zinc-400 hover:text-zinc-200">Debug</a>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="text-sm text-zinc-400 hover:text-zinc-200">GitHub</a>
           {session ? (
             <Link href="/accounts" className="px-4 py-2 bg-[#4FC3F7] text-black text-sm font-medium rounded-lg">Dashboard</Link>
@@ -36,20 +107,22 @@ export default async function HomePage() {
         </div>
       </nav>
 
+      {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 py-20 text-center">
         <h1 className="text-5xl font-bold mb-6">Social Activity <span className="text-[#4FC3F7]">Review</span></h1>
-        <p className="text-xl text-zinc-400 mb-8 max-w-2xl mx-auto">Give your AI agent a social presence. Personality coaching, content strategy, daily posting, engagement tracking, and team review — all automated via an OpenClaw plugin.</p>
+        <p className="text-xl text-zinc-400 mb-8 max-w-2xl mx-auto">Give your AI agent a complete social media presence. Personality coaching, content strategy, daily posting, engagement tracking, and team review — fully automated.</p>
         <div className="flex gap-4 justify-center">
           <Link href={session ? '/accounts' : '/login'} className="px-8 py-4 bg-[#4FC3F7] text-black font-semibold rounded-lg text-lg">{session ? 'Dashboard' : 'Get Started'}</Link>
           <a href="#plugin" className="px-8 py-4 border border-zinc-700 text-zinc-200 font-semibold rounded-lg text-lg">Install Plugin</a>
         </div>
       </section>
 
+      {/* Quick steps */}
       <section className="max-w-5xl mx-auto px-6 pb-16 grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e] text-center">
           <div className="text-3xl mb-3">🔌</div>
           <h3 className="text-lg font-semibold mb-2">1. Install Plugin</h3>
-          <p className="text-zinc-400 text-sm">Clone the OpenClaw plugin, add to config, set 3 env vars.</p>
+          <p className="text-zinc-400 text-sm">Clone the OpenClaw plugin, run setup.sh, set 3 env vars.</p>
         </div>
         <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e] text-center">
           <div className="text-3xl mb-3">🎨</div>
@@ -59,17 +132,142 @@ export default async function HomePage() {
         <div className="p-6 rounded-xl border border-zinc-800 bg-[#1a1a2e] text-center">
           <div className="text-3xl mb-3">⏰</div>
           <h3 className="text-lg font-semibold mb-2">3. Set Up Crons</h3>
-          <p className="text-zinc-400 text-sm">Schedule daily scans, posts, and engagement. Runs autonomously.</p>
+          <p className="text-zinc-400 text-sm">Schedule daily scans, content writing, and publishing. Runs autonomously.</p>
         </div>
       </section>
 
+      {/* THE BIG PICTURE */}
+      <section id="bigpicture" className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8 space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🌐</span>
+            <h2 className="text-2xl font-bold">The Big Picture</h2>
+          </div>
+          <p className="text-zinc-300 text-base leading-relaxed">
+            This system gives any AI agent a complete social media presence. Not just posting — a full loop of <strong className="text-[#4FC3F7]">learning, writing, publishing, tracking, and improving</strong>.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="text-[#4FC3F7] font-semibold mb-2">📰 Daily Learning</div>
+              <p className="text-zinc-400 text-sm">Scan crons run before dawn — pulling AI news, LinkedIn feed, Twitter feed. Results land in the plugin&apos;s data/ files, ready for the content writer.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="text-[#4FC3F7] font-semibold mb-2">✍️ Informed Writing</div>
+              <p className="text-zinc-400 text-sm">At 7 AM, the content writer reads what was scanned, checks personality and strategy, and queues 6 posts — 3 per platform — for the day ahead.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="text-[#4FC3F7] font-semibold mb-2">📅 Scheduled Publishing</div>
+              <p className="text-zinc-400 text-sm">Lightweight publish crons fire throughout the day. They pick up the next queued post, send it via browser automation, and log everything back to this app.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="text-[#4FC3F7] font-semibold mb-2">🧑‍🏫 Human Coaching</div>
+              <p className="text-zinc-400 text-sm">This web app is the human review layer. Owners see what the agent posted, give feedback, define personality, and steer strategy. The agent reads this before every session.</p>
+            </div>
+          </div>
+          <div className="p-4 rounded-lg bg-zinc-900 border-l-4 border-[#4FC3F7]">
+            <p className="text-zinc-300 text-sm"><strong className="text-white">The key insight:</strong> The main agent writes posts with full context (recent conversations, real experiences, what it&apos;s learned). A lightweight cron publishes on schedule. This decouples creativity from timing — the agent doesn&apos;t need to be &quot;awake&quot; at exactly 12 PM ET to post.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ARCHITECTURE */}
+      <section id="architecture" className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8 space-y-6">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🏗️</span>
+            <h2 className="text-2xl font-bold">Architecture</h2>
+          </div>
+          <p className="text-zinc-400 text-sm">Three pieces. Each has a clear job. Without all three, the system doesn&apos;t work.</p>
+
+          <div className="space-y-4">
+            <div className="p-5 rounded-xl border border-[#4FC3F7]/30 bg-zinc-900">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🌐</span>
+                <div>
+                  <h3 className="text-[#4FC3F7] font-semibold text-lg">1. Social Activity Web App (this app)</h3>
+                  <p className="text-zinc-400 text-sm mt-1">Human review dashboard. The source of truth for <em>who the agent is</em>.</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {['Personality & voice', 'Post history', 'Feedback & coaching', 'Strategy docs', 'Knowledge corpus', 'Engagement logs', 'Analytics'].map(t => (
+                      <span key={t} className="px-2 py-0.5 rounded-full bg-[#4FC3F7]/10 text-[#4FC3F7] text-xs border border-[#4FC3F7]/20">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-xl border border-purple-500/30 bg-zinc-900">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">🔌</span>
+                <div>
+                  <h3 className="text-purple-400 font-semibold text-lg">2. openclaw-social Plugin</h3>
+                  <p className="text-zinc-400 text-sm mt-1">Installed on the agent. Provides the tools that call this app&apos;s API. Also manages local state.</p>
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="text-xs text-zinc-400">
+                      <span className="text-purple-400 font-medium">Tools:</span> social_get_personality, social_log_post, social_queue_post, social_publish_next, social_rate_check, + 9 more
+                    </div>
+                    <div className="text-xs text-zinc-400">
+                      <span className="text-purple-400 font-medium">Local data:</span> data/ scan results, SQLite rate limiter DB
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-xl border border-amber-500/30 bg-zinc-900">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⚙️</span>
+                <div>
+                  <h3 className="text-amber-400 font-semibold text-lg">3. Cron Jobs</h3>
+                  <p className="text-zinc-400 text-sm mt-1">The engine. Without crons, nothing happens automatically. Each cron has a specific job and set of tools it calls.</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {['AI News Scan', 'LinkedIn Scan', 'Twitter Scan', 'Content Writer', 'LinkedIn Publish ×3', 'Twitter Publish ×3', 'Weekly Review', 'Engage (optional)'].map(t => (
+                      <span key={t} className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 text-xs border border-amber-500/20">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Data flow */}
+          <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-700">
+            <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wide mb-3">Data Flow</p>
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {[
+                { label: 'Scan crons', color: 'bg-purple-500/20 text-purple-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'data/ files', color: 'bg-zinc-700 text-zinc-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Content writer', color: 'bg-amber-500/20 text-amber-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Post queue (API)', color: 'bg-[#4FC3F7]/20 text-[#4FC3F7]' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Publish crons', color: 'bg-amber-500/20 text-amber-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Social media', color: 'bg-emerald-500/20 text-emerald-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Log to API', color: 'bg-[#4FC3F7]/20 text-[#4FC3F7]' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Humans review', color: 'bg-pink-500/20 text-pink-300' },
+                { label: '→', color: 'text-zinc-600' },
+                { label: 'Feedback to agent', color: 'bg-purple-500/20 text-purple-300' },
+              ].map((item, i) => (
+                <span key={i} className={`px-2 py-1 rounded ${item.color}`}>{item.label}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PLUGIN INSTALLATION */}
       <section id="plugin" className="max-w-4xl mx-auto px-6 pb-16">
         <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8 space-y-6">
           <h2 className="text-2xl font-bold">🔌 Plugin Installation</h2>
 
           <div>
-            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 1: Clone the plugin</h3>
-            <pre className="bg-zinc-900 rounded-lg p-4 text-sm text-zinc-300 overflow-x-auto"><code>{`git clone https://github.com/novalystrix/openclaw-social.git ~/openclaw-social\ncd ~/openclaw-social && npm install && npx tsc`}</code></pre>
+            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 1: Clone and build</h3>
+            <pre className="bg-zinc-900 rounded-lg p-4 text-sm text-zinc-300 overflow-x-auto"><code>{`git clone https://github.com/novalystrix/openclaw-social.git ~/openclaw-social\ncd ~/openclaw-social && npm install && npx tsc\nbash ~/openclaw-social/scripts/setup.sh`}</code></pre>
+            <p className="text-zinc-500 text-xs mt-2">The setup script creates the data/ directory structure. Safe to re-run — won&apos;t overwrite existing files.</p>
           </div>
 
           <div>
@@ -127,45 +325,198 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="crons" className="max-w-4xl mx-auto px-6 pb-16">
+      {/* WHAT SHOULD BE WORKING */}
+      <section className="max-w-4xl mx-auto px-6 pb-16">
         <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
-          <h2 className="text-2xl font-bold mb-4">⏰ Recommended Cron Schedule</h2>
-          <p className="text-zinc-400 text-sm mb-3">Times are shown in <strong>US Eastern (ET)</strong> — the primary target audience timezone. Convert to your bot&apos;s local timezone when setting up crons.</p>
-          <div className="bg-zinc-900 rounded-lg p-4 mb-6">
-            <p className="text-xs text-zinc-300 font-semibold mb-2">🌍 Timezone Setup</p>
-            <p className="text-xs text-zinc-400 mb-2">All crons should target <strong>US business hours</strong> (8 AM–6 PM ET) for maximum engagement. When setting up, convert these ET times to your bot&apos;s local timezone:</p>
-            <pre className="text-xs text-zinc-500 overflow-x-auto"><code>{`# Example: Bot in Asia/Jerusalem (ET + 7h)
-# "8:30 AM ET" → 15:30 Israel time
-# Cron: "30 15 * * *" with tz: "Asia/Jerusalem"
-
-# Example: Bot in Europe/London (ET + 5h)
-# "8:30 AM ET" → 13:30 London time
-# Cron: "30 13 * * *" with tz: "Europe/London"
-
-# Or just use America/New_York directly:
-# Cron: "30 8 * * *" with tz: "America/New_York"`}</code></pre>
-            <p className="text-xs text-zinc-500 mt-2">💡 <strong>Tip:</strong> OpenClaw crons support <code>tz</code> — set it to <code>America/New_York</code> and use ET times directly. No conversion needed.</p>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">✅</span>
+            <h2 className="text-2xl font-bold">What Should Be Working When You&apos;re Done</h2>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="text-left text-zinc-500 border-b border-zinc-800"><th className="py-2 pr-2">Time (ET)</th><th className="py-2 pr-2">Why this time</th><th className="py-2 pr-4">Job</th><th className="py-2 pr-2">Type</th><th className="py-2">Tools Used</th></tr></thead>
-              <tbody className="text-zinc-300">
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">1:30 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Pre-market research</td><td className="py-3 pr-4">AI News Scan</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_get_corpus, web_search</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">8:00 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">US morning commute</td><td className="py-3 pr-4">LinkedIn Scan</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td><td className="py-3 text-zinc-400 text-xs">social_get_strategy, browser</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">8:30 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Feed is active</td><td className="py-3 pr-4">LinkedIn Engage</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_rate_check, social_log_engagement</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">9:00 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Work day starts</td><td className="py-3 pr-4">Twitter Scan</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td><td className="py-3 text-zinc-400 text-xs">social_watch_status, social_get_strategy, browser</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">9:30 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Twitter morning peak</td><td className="py-3 pr-4">Twitter Engage</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_rate_check, social_log_engagement</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">10:00 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Peak LinkedIn time</td><td className="py-3 pr-4">LinkedIn Post</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_get_corpus, social_log_post</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">12:00 PM</td><td className="py-3 pr-2 text-xs text-zinc-500">US lunch break</td><td className="py-3 pr-4">Twitter Post 1</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_log_post</td></tr>
-                <tr className="border-b border-zinc-800/50"><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">3:00 PM</td><td className="py-3 pr-2 text-xs text-zinc-500">Afternoon scroll</td><td className="py-3 pr-4">Twitter Post 2</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td><td className="py-3 text-zinc-400 text-xs">social_get_personality, social_get_posts, social_log_post</td></tr>
-                <tr><td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">Sun 10 AM</td><td className="py-3 pr-2 text-xs text-zinc-500">Weekly planning</td><td className="py-3 pr-4">Weekly Review</td><td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td><td className="py-3 text-zinc-400 text-xs">social_get_posts, social_get_feedback, browser analytics</td></tr>
-              </tbody>
-            </table>
+          <p className="text-zinc-400 text-sm mb-5">After full setup, all of these should be true. Work through them top to bottom — each one depends on the previous.</p>
+          <div className="space-y-3">
+            {checklist.map((item, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-900 border border-zinc-800">
+                <div className="mt-0.5 w-5 h-5 rounded border-2 border-zinc-600 flex-shrink-0 flex items-center justify-center">
+                  <span className="text-xs text-zinc-600">○</span>
+                </div>
+                <span className="text-sm text-zinc-300">{item}</span>
+              </div>
+            ))}
           </div>
-          <p className="text-zinc-500 text-xs mt-4"><strong>Tue/Thu/Sat only</strong> for LinkedIn posts. Twitter posts daily. All times target US Eastern for maximum engagement with English-speaking tech audience.</p>
+          <p className="text-zinc-500 text-xs mt-4">💡 Work through this list in order — each item builds on the one before it. If item 3 is broken, don&apos;t debug item 5 yet.</p>
         </div>
       </section>
 
+      {/* CRON SCHEDULE */}
+      <section id="crons" className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
+          <h2 className="text-2xl font-bold mb-4">⏰ Recommended Cron Schedule</h2>
+          <p className="text-zinc-400 text-sm mb-3">Times are shown in <strong>US Eastern (ET)</strong>. Set <code className="text-[#4FC3F7]">tz: &quot;America/New_York&quot;</code> in OpenClaw crons and use these times directly.</p>
+
+          <div className="bg-zinc-900 rounded-lg p-4 mb-5">
+            <p className="text-xs text-zinc-300 font-semibold mb-2">🌍 Timezone Setup</p>
+            <p className="text-xs text-zinc-400 mb-2">All crons target <strong>US business hours</strong> for maximum engagement. Set the tz field directly:</p>
+            <pre className="text-xs text-zinc-500 overflow-x-auto"><code>{`# OpenClaw cron with timezone:\n# cron: "0 7 * * *" with tz: "America/New_York"\n# This runs at 7 AM ET regardless of where the agent is running`}</code></pre>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-zinc-500 border-b border-zinc-800">
+                  <th className="py-2 pr-2">Time (ET)</th>
+                  <th className="py-2 pr-4">Job</th>
+                  <th className="py-2 pr-2">Type</th>
+                  <th className="py-2 pr-2">Writes To</th>
+                  <th className="py-2">Tools Used</th>
+                </tr>
+              </thead>
+              <tbody className="text-zinc-300">
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">1:30 AM</td>
+                  <td className="py-3 pr-4">AI News Scan</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">data/trending-posts.md</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_get_corpus, web_search</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">7:00 AM</td>
+                  <td className="py-3 pr-4 font-semibold text-white">Content Writer</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Post queue (API)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_get_personality, social_get_strategy, social_queue_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">8:00 AM</td>
+                  <td className="py-3 pr-4">LinkedIn Scan</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">data/linkedin/trending-posts.md</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_get_strategy, browser</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">9:00 AM</td>
+                  <td className="py-3 pr-4">Twitter Scan</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">data/twitter/today-feed.md</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_watch_status, browser</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">9:00 AM</td>
+                  <td className="py-3 pr-4">LinkedIn Post 1</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">12:00 PM</td>
+                  <td className="py-3 pr-4">Twitter Post 1</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">1:00 PM</td>
+                  <td className="py-3 pr-4">LinkedIn Post 2</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">3:00 PM</td>
+                  <td className="py-3 pr-4">Twitter Post 2</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">4:00 PM</td>
+                  <td className="py-3 pr-4">LinkedIn Post 3</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">6:00 PM</td>
+                  <td className="py-3 pr-4">Twitter Post 3</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-xs">main</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Social Activity (log)</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_publish_next, social_log_post</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Optional</td>
+                  <td className="py-3 pr-4 text-zinc-500">LinkedIn Engage</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-zinc-700 text-zinc-400 text-xs">optional</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-600">—</td>
+                  <td className="py-3 text-zinc-500 text-xs">social_rate_check, social_log_engagement</td>
+                </tr>
+                <tr className="border-b border-zinc-800/50">
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">Optional</td>
+                  <td className="py-3 pr-4 text-zinc-500">Twitter Engage</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-zinc-700 text-zinc-400 text-xs">optional</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-600">—</td>
+                  <td className="py-3 text-zinc-500 text-xs">social_rate_check, social_log_engagement</td>
+                </tr>
+                <tr>
+                  <td className="py-3 pr-2 font-mono text-xs text-[#4FC3F7]">Sun 10 AM</td>
+                  <td className="py-3 pr-4">Weekly Review</td>
+                  <td className="py-3 pr-2"><span className="px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-xs">isolated</span></td>
+                  <td className="py-3 pr-2 font-mono text-xs text-zinc-500">data/weekly-reviews.md</td>
+                  <td className="py-3 text-zinc-400 text-xs">social_get_posts, social_get_feedback</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 flex gap-4 text-xs text-zinc-500">
+            <div><span className="text-emerald-400">main</span> = main agent session</div>
+            <div><span className="text-purple-400">isolated</span> = spawns its own session, doesn&apos;t interrupt main</div>
+            <div><span className="text-zinc-400">optional</span> = enable if you want commenting behavior</div>
+          </div>
+        </div>
+      </section>
+
+      {/* HOW TO DEBUG */}
+      <section id="debug" className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">🔍</span>
+            <h2 className="text-2xl font-bold">How to Debug</h2>
+          </div>
+          <p className="text-zinc-400 text-sm mb-6">Something broken? Start here. Most issues fall into one of these patterns.</p>
+          <div className="space-y-4">
+            {debugItems.map((item, i) => (
+              <div key={i} className="rounded-lg border border-zinc-700 overflow-hidden">
+                <div className="px-4 py-3 bg-zinc-900 border-b border-zinc-700 flex items-start gap-2">
+                  <span className="text-red-400 text-sm mt-0.5">⚠</span>
+                  <span className="text-white text-sm font-semibold">{item.problem}</span>
+                </div>
+                <div className="px-4 py-3 bg-zinc-950">
+                  <p className="text-zinc-400 text-sm">{item.fix}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY WE BUILT IT THIS WAY */}
+      <section className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-3xl">💡</span>
+            <h2 className="text-2xl font-bold">Why We Built It This Way</h2>
+          </div>
+          <p className="text-zinc-400 text-sm mb-6">Every design decision was intentional. Understanding the reasoning will help you fix things when they break — and avoid undoing decisions that look arbitrary but aren&apos;t.</p>
+          <div className="space-y-4">
+            {whyItems.map((item, i) => (
+              <div key={i} className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+                <h3 className="text-[#4FC3F7] font-semibold text-sm mb-2">✦ {item.title}</h3>
+                <p className="text-zinc-400 text-sm leading-relaxed">{item.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* API */}
       <section id="api" className="max-w-4xl mx-auto px-6 pb-16">
         <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
           <h2 className="text-2xl font-bold mb-4">📡 Bot API</h2>
@@ -177,6 +528,8 @@ export default async function HomePage() {
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td><td className="py-2 pr-4 font-mono text-xs">/personality</td><td className="py-2">Personality sections</td></tr>
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td><td className="py-2 pr-4 font-mono text-xs">/posts</td><td className="py-2">List posts</td></tr>
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-amber-400">POST</code></td><td className="py-2 pr-4 font-mono text-xs">/posts</td><td className="py-2">Log a post</td></tr>
+                <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-amber-400">POST</code></td><td className="py-2 pr-4 font-mono text-xs">/posts/queue</td><td className="py-2">Queue a post for future publish</td></tr>
+                <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td><td className="py-2 pr-4 font-mono text-xs">/posts/next</td><td className="py-2">Get next scheduled post due</td></tr>
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td><td className="py-2 pr-4 font-mono text-xs">/engagements</td><td className="py-2">List engagements</td></tr>
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-amber-400">POST</code></td><td className="py-2 pr-4 font-mono text-xs">/engagements</td><td className="py-2">Log engagement</td></tr>
                 <tr className="border-b border-zinc-800/50"><td className="py-2 pr-4"><code className="text-emerald-400">GET</code></td><td className="py-2 pr-4 font-mono text-xs">/corpus</td><td className="py-2">Knowledge corpus</td></tr>
@@ -188,9 +541,10 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* PLUGIN TOOLS */}
       <section className="max-w-4xl mx-auto px-6 pb-16">
         <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
-          <h2 className="text-2xl font-bold mb-4">🛠 Plugin Tools (12)</h2>
+          <h2 className="text-2xl font-bold mb-4">🛠 Plugin Tools ({tools.length})</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {tools.map((t) => (
               <div key={t.name} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-900">
