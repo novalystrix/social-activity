@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Social Activity Review",
+  title: "Agent Presence",
   description: "Review, coach, and improve your AI agent's social presence",
 };
 

@@ -43,8 +43,9 @@ export default async function HomePage() {
     <div className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       {/* Nav */}
       <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <div className="text-lg font-bold">Social <span className="text-[#4FC3F7]">Activity</span></div>
+        <div className="text-lg font-bold">Agent <span className="text-[#4FC3F7]">Presence</span></div>
         <div className="flex items-center gap-4">
+          <Link href="/pricing" className="text-zinc-400 hover:text-zinc-200 text-sm">Pricing</Link>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-200"><IconGithub /></a>
           {session ? (
             <Link href="/accounts" className="px-4 py-2 bg-[#4FC3F7] text-black text-sm font-medium rounded-lg">Dashboard</Link>
@@ -302,7 +303,7 @@ export default async function HomePage() {
 
       <footer className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <span>Social Activity Review</span>
+          <span>Agent Presence</span>
           <span>·</span>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300">Plugin</a>
           <span>·</span>
