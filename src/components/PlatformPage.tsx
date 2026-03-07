@@ -102,74 +102,92 @@ const METRIC_DESCS: Record<string, string> = {
 function XPostCard({ post, replies }: { post: Post; replies: Engagement[] }) {
   return (
     <div>
-      <div className="px-4 py-3 border border-zinc-800 rounded-xl bg-[#16181c] hover:bg-[#1d1f23] transition-colors">
+      <div className="px-4 py-3 border-b border-[#2f3336] bg-black hover:bg-[#080808] transition-colors">
         <div className="flex gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">N</div>
+          {/* Avatar */}
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0 overflow-hidden">
+            N
+          </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1 flex-wrap">
-              <span className="font-bold text-[15px] text-zinc-100">Novalystrix</span>
-              <svg className="w-4 h-4 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/></svg>
-              <span className="text-zinc-500 text-[15px]">@novalystrix</span>
-              <span className="text-zinc-600">&middot;</span>
-              <span className="text-zinc-500 text-sm">{timeAgo(post.publishedAt || post.createdAt)}</span>
+            {/* Header line */}
+            <div className="flex items-center gap-1 text-[15px]">
+              <span className="font-bold text-[#e7e9ea]">Nova lystrix</span>
+              <svg className="w-[18px] h-[18px] text-[#1d9bf0]" fill="currentColor" viewBox="0 0 24 24"><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/></svg>
+              <span className="text-[#71767b]">@NovaLystrix</span>
+              <span className="text-[#71767b]">&middot;</span>
+              <span className="text-[#71767b]">{timeAgo(post.publishedAt || post.createdAt)}</span>
               {post.status !== 'published' && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ml-1 ${TAG_COLORS[post.status] || 'bg-zinc-500/15 text-zinc-400'}`}>{post.status}</span>
               )}
             </div>
-            <p className="text-[15px] text-zinc-100 mt-1 whitespace-pre-wrap leading-relaxed">{post.text}</p>
+            {/* Post text */}
+            <div className="mt-0.5">
+              <p className="text-[15px] text-[#e7e9ea] whitespace-pre-wrap leading-[1.4]">{post.text}</p>
+            </div>
+            {/* Tags */}
             <div className="flex items-center gap-2 mt-2">
               <span className={`text-[10px] px-2 py-0.5 rounded-full ${TAG_COLORS[post.postType] || 'bg-zinc-500/15 text-zinc-400'}`}>{post.postType}</span>
             </div>
             {/* Action bar */}
-            <div className="flex items-center justify-between mt-3 max-w-md text-zinc-500">
-              <div className="flex items-center gap-1.5 group hover:text-sky-400 transition-colors cursor-default">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-sky-400/10 transition-colors">
-                  <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" /></svg>
+            <div className="flex items-center mt-3 -ml-2 max-w-[425px] justify-between">
+              {/* Reply */}
+              <div className="flex items-center group cursor-default">
+                <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center group-hover:bg-[#1d9bf0]/10 transition-colors">
+                  <svg className="w-[18px] h-[18px] text-[#71767b] group-hover:text-[#1d9bf0] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" /></svg>
                 </div>
-                <span className="text-[13px]">{post.comments || ''}</span>
+                {post.comments > 0 && <span className="text-[13px] text-[#71767b] group-hover:text-[#1d9bf0] transition-colors">{post.comments}</span>}
               </div>
-              <div className="flex items-center gap-1.5 group hover:text-emerald-400 transition-colors cursor-default">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-emerald-400/10 transition-colors">
-                  <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
+              {/* Repost */}
+              <div className="flex items-center group cursor-default">
+                <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center group-hover:bg-[#00ba7c]/10 transition-colors">
+                  <svg className="w-[18px] h-[18px] text-[#71767b] group-hover:text-[#00ba7c] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
                 </div>
-                <span className="text-[13px]">{post.reposts || ''}</span>
+                {post.reposts > 0 && <span className="text-[13px] text-[#71767b] group-hover:text-[#00ba7c] transition-colors">{post.reposts}</span>}
               </div>
-              <div className="flex items-center gap-1.5 group hover:text-rose-400 transition-colors cursor-default">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-rose-400/10 transition-colors">
-                  <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
+              {/* Like */}
+              <div className="flex items-center group cursor-default">
+                <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center group-hover:bg-[#f91880]/10 transition-colors">
+                  <svg className="w-[18px] h-[18px] text-[#71767b] group-hover:text-[#f91880] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>
                 </div>
-                <span className="text-[13px]">{post.likes || ''}</span>
+                {post.likes > 0 && <span className="text-[13px] text-[#71767b] group-hover:text-[#f91880] transition-colors">{post.likes}</span>}
               </div>
-              <div className="flex items-center gap-1.5 group hover:text-sky-400 transition-colors cursor-default">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center group-hover:bg-sky-400/10 transition-colors">
-                  <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+              {/* Views */}
+              <div className="flex items-center group cursor-default">
+                <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center group-hover:bg-[#1d9bf0]/10 transition-colors">
+                  <svg className="w-[18px] h-[18px] text-[#71767b] group-hover:text-[#1d9bf0] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
                 </div>
-                <span className="text-[13px]">{post.impressions ? post.impressions.toLocaleString() : ''}</span>
+                {post.impressions > 0 && <span className="text-[13px] text-[#71767b] group-hover:text-[#1d9bf0] transition-colors">{post.impressions.toLocaleString()}</span>}
               </div>
-              {post.url && (
-                <a href={post.url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-sky-400/10 transition-colors">
-                  <svg className="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-                </a>
-              )}
+              {/* Bookmark + Share */}
+              <div className="flex items-center gap-0">
+                <div className="w-[34px] h-[34px] rounded-full flex items-center justify-center hover:bg-[#1d9bf0]/10 transition-colors cursor-default">
+                  <svg className="w-[18px] h-[18px] text-[#71767b] hover:text-[#1d9bf0] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>
+                </div>
+                {post.url && (
+                  <a href={post.url} target="_blank" rel="noopener noreferrer" className="w-[34px] h-[34px] rounded-full flex items-center justify-center hover:bg-[#1d9bf0]/10 transition-colors">
+                    <svg className="w-[18px] h-[18px] text-[#71767b] hover:text-[#1d9bf0] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" /></svg>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
       {/* Threaded replies */}
       {replies.length > 0 && (
-        <div className="ml-8 border-l-2 border-zinc-800 pl-4 space-y-0">
+        <div className="border-l-2 border-[#2f3336] ml-[31px]">
           {replies.map((r) => (
-            <div key={r.id} className="py-3 flex gap-3">
+            <div key={r.id} className="px-4 py-3 border-b border-[#2f3336] bg-black flex gap-3">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">N</div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1">
-                  <span className="font-bold text-sm text-zinc-100">Novalystrix</span>
-                  <span className="text-zinc-500 text-sm">@novalystrix</span>
-                  <span className="text-zinc-600">&middot;</span>
-                  <span className="text-zinc-500 text-xs">{timeAgo(r.createdAt)}</span>
+                <div className="flex items-center gap-1 text-[15px]">
+                  <span className="font-bold text-[#e7e9ea] text-sm">Nova lystrix</span>
+                  <span className="text-[#71767b] text-sm">@NovaLystrix</span>
+                  <span className="text-[#71767b]">&middot;</span>
+                  <span className="text-[#71767b] text-sm">{timeAgo(r.createdAt)}</span>
                 </div>
-                {r.targetAuthor && <p className="text-xs text-zinc-500">Replying to <span className="text-sky-400">@{r.targetAuthor}</span></p>}
-                {r.myText && <p className="text-sm text-zinc-200 mt-1">{r.myText}</p>}
+                {r.targetAuthor && <p className="text-[13px] text-[#71767b]">Replying to <span className="text-[#1d9bf0]">@{r.targetAuthor}</span></p>}
+                {r.myText && <p className="text-[15px] text-[#e7e9ea] mt-0.5 leading-[1.4]">{r.myText}</p>}
               </div>
             </div>
           ))}
