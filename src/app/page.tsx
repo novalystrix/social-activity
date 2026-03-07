@@ -301,9 +301,39 @@ export default async function HomePage() {
         </div>
       </section>
 
+
+      {/* Pricing */}
+      <div className="max-w-4xl mx-auto px-6 pb-8">
+        <div className="border-t border-zinc-800"></div>
+      </div>
+      <section id="pricing" className="max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-3xl font-bold text-center mb-4">Simple, transparent pricing</h2>
+        <p className="text-zinc-400 text-center mb-12">Start free with one channel. Upgrade when you&apos;re ready for more.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { name: 'Starter', price: 'Free', period: '', desc: 'Everything you need to get one channel running.', highlight: false, features: ['1 channel (Twitter or LinkedIn)', '1 agent account', '1 team member', '300 posts & replies per month', '30-day history', 'Full personality interview', 'Full corpus & strategy'] },
+            { name: 'Pro', price: '$19', period: '/mo', desc: 'Go multi-channel with your full team.', highlight: true, features: ['2 channels', '3 agent accounts', '5 team members', 'Unlimited posts & replies', 'Unlimited history', 'Full personality interview', 'Full corpus & strategy', 'Journal system', 'Team feedback & coaching', 'Full analytics'] },
+            { name: 'Pro Max', price: '$49', period: '/mo', desc: 'For agencies and teams managing multiple agents.', highlight: false, features: ['Unlimited channels', '10 agent accounts', 'Unlimited team members', 'Everything in Pro', 'Full API access + webhooks', 'Priority support', 'Custom branding'] },
+          ].map((tier) => (
+            <div key={tier.name} className={`rounded-2xl border p-8 flex flex-col ${tier.highlight ? 'border-[#4FC3F7] bg-[#4FC3F7]/5 ring-1 ring-[#4FC3F7]/20' : 'border-zinc-800 bg-[#1a1a2e]'}`}>
+              {tier.highlight && <div className="mb-4"><span className="text-xs font-semibold uppercase tracking-wider bg-[#4FC3F7] text-black px-3 py-1 rounded-full">Most Popular</span></div>}
+              <h3 className="text-xl font-bold mb-1">{tier.name}</h3>
+              <p className="text-zinc-400 text-sm mb-6">{tier.desc}</p>
+              <div className="mb-8"><span className="text-4xl font-bold">{tier.price}</span>{tier.period && <span className="text-zinc-400 text-lg">{tier.period}</span>}</div>
+              <Link href={session ? '/accounts' : '/login'} className={`block text-center py-3 px-6 rounded-lg font-semibold text-sm mb-8 transition-colors ${tier.highlight ? 'bg-[#4FC3F7] text-black hover:bg-[#3bb0e0]' : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700 border border-zinc-700'}`}>{tier.price === 'Free' ? 'Get Started' : `Upgrade to ${tier.name}`}</Link>
+              <ul className="space-y-3 flex-1">
+                {tier.features.map((f: string, i: number) => (<li key={i} className="flex items-start gap-3"><svg className="w-5 h-5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg><span className="text-sm text-zinc-300">{f}</span></li>))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <footer className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm">
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <span>Agent Presence</span>
+          <span>·</span>
+          <Link href="/pricing" className="hover:text-zinc-300">Pricing</Link>
           <span>·</span>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300">Plugin</a>
           <span>·</span>
