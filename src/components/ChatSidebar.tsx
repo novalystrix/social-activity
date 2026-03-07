@@ -14,12 +14,24 @@ interface Msg {
 
 export default function ChatSidebar({ accountId }: { accountId: string }) {
   const [open, setOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [unread, setUnread] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastCountRef = useRef(0);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsDesktop(e.matches);
+      if (e.matches) setOpen(true);
+    };
+    handler(mq);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   const fetchMessages = useCallback(async () => {
     try {
@@ -64,33 +76,40 @@ export default function ChatSidebar({ accountId }: { accountId: string }) {
     }
   }
 
+  const showPanel = isDesktop || open;
+
   return (
     <>
-      {/* Toggle FAB */}
-      <button
-        onClick={() => setOpen(!open)}
-        className="fixed right-4 bottom-4 z-50 w-11 h-11 rounded-full bg-[#4FC3F7] text-black flex items-center justify-center shadow-lg hover:bg-[#4FC3F7]/90 transition-all"
-      >
-        {open ? (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-        ) : (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        )}
-        {unread > 0 && !open && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center font-bold">
-            {unread > 9 ? '9+' : unread}
-          </span>
-        )}
-      </button>
+      {!isDesktop && (
+        <button
+          onClick={() => setOpen(!open)}
+          className="fixed right-4 bottom-4 z-50 w-11 h-11 rounded-full bg-[#4FC3F7] text-black flex items-center justify-center shadow-lg hover:bg-[#4FC3F7]/90 transition-all lg:hidden"
+        >
+          {open ? (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          )}
+          {unread > 0 && !open && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center font-bold">
+              {unread > 9 ? '9+' : unread}
+            </span>
+          )}
+        </button>
+      )}
 
-      {/* Slide-in panel */}
-      <div className={`fixed right-0 top-0 h-screen z-40 transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '22rem' }}>
+      <div
+        className={`fixed right-0 top-0 h-screen z-40 transition-transform duration-300 ${showPanel ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ width: '22rem' }}
+      >
         <div className="h-full flex flex-col bg-[#111127] border-l border-zinc-800 shadow-2xl">
           <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-200">Team Chat</h3>
-            <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
+            {!isDesktop && (
+              <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">

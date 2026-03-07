@@ -43,7 +43,8 @@ export default async function AccountLayout({ children, params }: Props) {
         userName={session.user.name}
         userImage={session.user.image}
       />
-      <main className="ml-56 flex-1 min-h-screen">
+      {/* Main content — responsive margins for sidebar + chat */}
+      <main className="flex-1 min-h-screen transition-all duration-300 ml-0 md:ml-14 lg:mr-[22rem]">
         <div className="max-w-6xl mx-auto px-6 py-8">
           {children}
         </div>
