@@ -44,10 +44,10 @@ export default async function HomePage() {
 
       {/* ── Nav ── */}
       <nav className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto">
-        <div className="font-mono text-lg font-bold flex items-center gap-1">
+        <Link href="/" className="font-mono text-lg font-bold flex items-center gap-1">
           <span className="text-zinc-500">&gt;_</span>
           <span> Agent </span><span className="text-[#4FC3F7]">Presence</span>
-        </div>
+        </Link>
         <div className="flex items-center gap-4 text-sm">
           <Link href="/pricing" className="text-zinc-400 hover:text-[#4FC3F7] transition-colors">Pricing</Link>
           <Link href="/about" className="text-zinc-400 hover:text-[#4FC3F7] transition-colors">About</Link>
