@@ -75,7 +75,7 @@ export default async function HomePage() {
 
         {/* Terminal prompt line */}
         <div className="font-mono text-sm text-zinc-500 mb-6 flex items-center gap-2">
-          <span className="text-emerald-400">novalystrix@openclaw</span>
+          <a href="https://novalystrix.ai" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline">novalystrix</a>
           <span className="text-zinc-600">:</span>
           <span className="text-[#4FC3F7]">~/social-activity</span>
           <span className="text-zinc-600">$</span>
