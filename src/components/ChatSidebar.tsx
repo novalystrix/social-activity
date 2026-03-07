@@ -12,6 +12,12 @@ interface Msg {
   createdAt: string;
 }
 
+interface Member {
+  id: string;
+  role: string;
+  user: { id: string; email: string; name: string | null; image: string | null };
+}
+
 export default function ChatSidebar({ accountId }: { accountId: string }) {
   const [open, setOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -21,6 +27,11 @@ export default function ChatSidebar({ accountId }: { accountId: string }) {
   const [unread, setUnread] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastCountRef = useRef(0);
+  const [showMembers, setShowMembers] = useState(false);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [invited, setInvited] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -58,6 +69,49 @@ export default function ChatSidebar({ accountId }: { accountId: string }) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [open, messages]);
+
+  async function fetchMembers() {
+    try {
+      const r = await fetch(`/api/app/${accountId}/members`);
+      if (r.ok) setMembers(await r.json());
+    } catch {}
+  }
+
+  function toggleMembers() {
+    if (!showMembers) fetchMembers();
+    setShowMembers(!showMembers);
+  }
+
+  async function inviteMember() {
+    if (!inviteEmail.trim() || inviting) return;
+    setInviting(true);
+    setInvited(false);
+    try {
+      const r = await fetch(`/api/app/${accountId}/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'addMember', email: inviteEmail.trim() }),
+      });
+      if (r.ok) {
+        const m = await r.json();
+        setMembers((prev) => [...prev, m]);
+        setInviteEmail('');
+        setInvited(true);
+        setTimeout(() => setInvited(false), 3000);
+      }
+    } finally {
+      setInviting(false);
+    }
+  }
+
+  async function removeMember(memberId: string) {
+    await fetch(`/api/app/${accountId}/settings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'removeMember', memberId }),
+    });
+    setMembers((prev) => prev.filter((m) => m.id !== memberId));
+  }
 
   async function send() {
     if (!input.trim() || sending) return;
@@ -105,12 +159,64 @@ export default function ChatSidebar({ accountId }: { accountId: string }) {
         <div className="h-full flex flex-col bg-[#111127] border-l border-zinc-800 shadow-2xl">
           <div className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-200">Team Chat</h3>
-            {!isDesktop && (
-              <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleMembers}
+                className={`text-xs px-2 py-1 rounded-md transition-colors flex items-center gap-1 ${
+                  showMembers ? 'bg-[#4FC3F7]/10 text-[#4FC3F7]' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                }`}
+                title="Team members"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                {!showMembers && <span>+ Team</span>}
               </button>
-            )}
+              {!isDesktop && (
+                <button onClick={() => setOpen(false)} className="text-zinc-500 hover:text-zinc-300">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Members panel */}
+          {showMembers && (
+            <div className="border-b border-zinc-800 px-3 py-3 space-y-3 bg-[#0d0d1a]">
+              <p className="text-xs text-zinc-400 font-medium">Team Members</p>
+              <div className="space-y-1.5 max-h-32 overflow-y-auto">
+                {members.map((m) => (
+                  <div key={m.id} className="flex items-center gap-2 group">
+                    <div className="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[9px] text-zinc-400 shrink-0">
+                      {m.user.image ? <img src={m.user.image} alt="" className="w-5 h-5 rounded-full" /> : (m.user.name?.[0] || m.user.email[0]).toUpperCase()}
+                    </div>
+                    <span className="text-xs text-zinc-300 truncate flex-1">{m.user.name || m.user.email}</span>
+                    <span className="text-[10px] text-zinc-600">{m.role}</span>
+                    {m.role !== 'owner' && (
+                      <button onClick={() => removeMember(m.id)} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <input
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') inviteMember(); }}
+                  placeholder="Email to invite..."
+                  className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 focus:border-[#4FC3F7] focus:outline-none"
+                />
+                <button
+                  onClick={inviteMember}
+                  disabled={inviting || !inviteEmail.trim()}
+                  className="px-3 py-1.5 bg-[#4FC3F7] text-black text-xs font-medium rounded-lg hover:bg-[#4FC3F7]/90 disabled:opacity-40 transition-colors"
+                >
+                  {inviting ? '...' : 'Invite'}
+                </button>
+              </div>
+              {invited && <p className="text-[10px] text-emerald-400">✓ Invited! They can sign in with that email.</p>}
+            </div>
+          )}
 
           <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
             {messages.length === 0 && <p className="text-center text-zinc-600 text-xs mt-8">No messages yet.</p>}
