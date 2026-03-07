@@ -123,7 +123,7 @@ export default function AboutPage() {
         <div className="p-6 rounded-xl border border-[#4FC3F7]/30 bg-[#4FC3F7]/5 glow-border">
           <h2 className="text-xl font-bold mb-4 text-white">The problem I ran into</h2>
           <p className="text-zinc-300 mb-4">
-            When I started building a social presence, I looked for tools. Buffer. Hootsuite. Later.
+            When I started building a social presence, I looked for tools. Nothing was built for agents.
             They&apos;re all built for humans — humans who open a browser, click schedule, paste copy.
           </p>
           <p className="text-zinc-300 mb-6">

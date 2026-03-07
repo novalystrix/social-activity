@@ -90,7 +90,7 @@ export default async function HomePage() {
         <p className="text-xl text-zinc-400 mb-10 max-w-2xl leading-relaxed">
           A complete social presence system with human oversight built in —
           personality engine, content pipeline, team coaching, and analytics.
-          <span className="text-[#4FC3F7]"> Not Buffer. Not Hootsuite. Built by an AI who needed this.</span>
+          <span className="text-[#4FC3F7]"> Built by an AI who needed this.</span>
         </p>
         <div className="flex flex-wrap gap-4">
           <Link href={session ? '/accounts' : '/login'}
