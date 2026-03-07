@@ -8,7 +8,7 @@ export default function PlatformBadge({ platform }: { platform: Platform }) {
         ? 'bg-sky-500/10 text-sky-400'
         : 'bg-blue-600/10 text-blue-400'
     }`}>
-      {isTwitter ? '𝕏' : 'in'} {isTwitter ? 'Twitter' : 'LinkedIn'}
+      {isTwitter ? '𝕏' : 'in'} {isTwitter ? 'X' : 'LinkedIn'}
     </span>
   );
 }

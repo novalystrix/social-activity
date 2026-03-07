@@ -39,7 +39,7 @@ export default async function AccountDashboard({ params }: Props) {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {[
           { label: 'Total Posts', value: postCount, accent: true },
-          { label: 'Twitter Posts', value: twitterPosts },
+          { label: 'X Posts', value: twitterPosts },
           { label: 'LinkedIn Posts', value: linkedinPosts },
           { label: 'Engagements', value: engagementCount },
           { label: 'Followers', value: followerCount },
@@ -62,7 +62,7 @@ export default async function AccountDashboard({ params }: Props) {
             <svg className="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
-            <h2 className="font-semibold text-white group-hover:text-sky-400 transition-colors">Twitter</h2>
+            <h2 className="font-semibold text-white group-hover:text-sky-400 transition-colors">X</h2>
           </div>
           <p className="text-sm text-zinc-400">{twitterPosts} posts &middot; View posts, replies, followers</p>
         </Link>

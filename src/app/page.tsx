@@ -33,7 +33,7 @@ export default async function HomePage() {
     { name: 'social_queue_post', desc: 'Queue post for publishing' },
     { name: 'social_publish_next', desc: 'Get next due post' },
     { name: 'social_upsert_influencer', desc: 'Add/update influencer' },
-    { name: 'social_watch_status', desc: 'Twitter watcher status' },
+    { name: 'social_watch_status', desc: 'X watcher status' },
     { name: 'social_rate_check', desc: 'Check rate limits' },
     { name: 'social_advance_phase', desc: 'Advance influencer phase' },
     { name: 'social_monday_sync', desc: 'Sync from Monday.com' },
@@ -110,7 +110,7 @@ export default async function HomePage() {
         <div className="mt-12 font-mono text-xs text-zinc-600 flex flex-wrap gap-6 border-t border-zinc-900 pt-6">
           <span><span className="text-emerald-400">●</span> LIVE</span>
           <span>14 tools available</span>
-          <span>Twitter + LinkedIn</span>
+          <span>X + LinkedIn</span>
           <span>scan → write → publish → review</span>
           <span className="text-[#4FC3F7]">open source</span>
         </div>
@@ -137,7 +137,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 rounded-lg bg-zinc-900/80 border border-zinc-800 hover:border-[#4FC3F7]/30 transition-colors">
               <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconNews /> Daily Learning</div>
-              <p className="text-zinc-400 text-sm">Scan crons run before dawn — pulling AI news, LinkedIn feed, Twitter feed. Results land in the plugin&apos;s data files, ready for the content writer.</p>
+              <p className="text-zinc-400 text-sm">Scan crons run before dawn — pulling AI news, LinkedIn feed, X feed. Results land in the plugin&apos;s data files, ready for the content writer.</p>
             </div>
             <div className="p-4 rounded-lg bg-zinc-900/80 border border-zinc-800 hover:border-[#4FC3F7]/30 transition-colors">
               <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconPen /> Informed Writing</div>
@@ -271,8 +271,8 @@ export default async function HomePage() {
               'social_log_post logs a post and it appears in the app immediately',
               'Scan crons write to ~/openclaw-social/data/ — content writer reads from there',
               'Content writer queues 6 posts/day (3 per platform) via social_queue_post',
-              'Publish crons pick up queued posts and post to Twitter/LinkedIn via browser automation',
-              'Rate limiter enforces platform limits (LinkedIn: 30/hr, Twitter: 120/hr)',
+              'Publish crons pick up queued posts and post to X/LinkedIn via browser automation',
+              'Rate limiter enforces platform limits (LinkedIn: 30/hr, X: 120/hr)',
               'Team feedback is available via social_get_feedback — read it before every writing session',
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 font-mono text-sm">
@@ -306,7 +306,7 @@ export default async function HomePage() {
               { problem: 'Posts not appearing in app', fix: 'Check if content writer cron ran. Verify social_queue_post is called. Look at the Posts page.' },
               { problem: 'Personality empty', fix: 'Run the interview: tell your agent "Interview me to build my social personality."' },
               { problem: 'Publish cron says "no post due"', fix: 'Content writer didn\'t queue anything. Check if it ran, or trigger it manually.' },
-              { problem: 'Rate limit errors', fix: 'Call social_rate_check before posting. LinkedIn: 30/hr, Twitter: 120/hr.' },
+              { problem: 'Rate limit errors', fix: 'Call social_rate_check before posting. LinkedIn: 30/hr, X: 120/hr.' },
               { problem: 'Browser automation failing', fix: 'Check browser profile exists and agent is logged in. Re-login if sessions expired.' },
             ].map((item, i) => (
               <div key={i} className="rounded-lg border border-zinc-700 overflow-hidden">
@@ -331,7 +331,7 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { name: 'Starter', price: 'Free', period: '', desc: 'Everything you need to get one channel running.', highlight: false, features: ['1 channel (Twitter or LinkedIn)', '1 agent account', '1 team member', '300 posts & replies per month', '30-day history', 'Full personality interview', 'Full corpus & strategy'] },
+            { name: 'Starter', price: 'Free', period: '', desc: 'Everything you need to get one channel running.', highlight: false, features: ['1 channel (X or LinkedIn)', '1 agent account', '1 team member', '300 posts & replies per month', '30-day history', 'Full personality interview', 'Full corpus & strategy'] },
             { name: 'Pro', price: '$19', period: '/mo', desc: 'Go multi-channel with your full team.', highlight: true, features: ['2 channels', '3 agent accounts', '5 team members', 'Unlimited posts & replies', 'Unlimited history', 'Full personality interview', 'Full corpus & strategy', 'Journal system', 'Team feedback & coaching', 'Full analytics'] },
             { name: 'Pro Max', price: '$49', period: '/mo', desc: 'For agencies and teams managing multiple agents.', highlight: false, features: ['Unlimited channels', '10 agent accounts', 'Unlimited team members', 'Everything in Pro', 'Full API access + webhooks', 'Priority support', 'Custom branding'] },
           ].map((tier) => (

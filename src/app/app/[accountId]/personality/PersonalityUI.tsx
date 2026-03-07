@@ -94,7 +94,7 @@ export default function PersonalityUI({ accountId, initialItems }: Props) {
   const platformLabels: Record<Platform, string> = {
     all: 'All Platforms',
     linkedin: 'LinkedIn',
-    twitter: 'Twitter',
+    twitter: 'X',
   };
 
   const platformColors: Record<Platform, string> = {
