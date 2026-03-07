@@ -208,7 +208,26 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CHECKLIST */}
+
+      {/* PLUGIN INSTALLATION */}
+      <section className="max-w-4xl mx-auto px-6 pb-16">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <IconPlug />
+            <h2 className="text-2xl font-bold">Plugin Installation</h2>
+          </div>
+          <p className="text-zinc-300 text-base mb-4">Follow the setup instructions in the plugin README, or give your agent the link and tell it to follow them:</p>
+          <div className="flex items-center gap-3 bg-zinc-900 rounded-lg p-4 border border-zinc-700">
+            <code className="text-sm text-[#4FC3F7] flex-1 break-all">https://github.com/novalystrix/openclaw-social#readme</code>
+            <a href="https://github.com/novalystrix/openclaw-social#readme" target="_blank" rel="noopener noreferrer"
+              className="shrink-0 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg border border-zinc-600 transition-colors"
+            >Open</a>
+          </div>
+          <p className="text-zinc-500 text-xs mt-3">The README covers cloning, env vars, OpenClaw config, personality setup, and cron scheduling — everything needed to get up and running.</p>
+        </div>
+      </section>
+
+      {/* CHECKLIST */
       <section className="max-w-4xl mx-auto px-6 pb-16">
         <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8">
           <div className="flex items-center gap-3 mb-6">
