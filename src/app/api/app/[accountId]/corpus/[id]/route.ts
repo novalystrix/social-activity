@@ -34,3 +34,13 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   const updated = await prisma.corpus.findFirst({ where: { id, accountId } });
   return NextResponse.json(updated);
 }
+
+
+export async function DELETE(req: NextRequest, { params }: RouteContext) {
+  const { accountId, id } = await params;
+  const { error } = await getAuthContext(accountId);
+  if (error) return error;
+
+  await prisma.corpus.delete({ where: { id } });
+  return NextResponse.json({ ok: true });
+}
