@@ -23,7 +23,8 @@ model Account {
   slug         String            @unique
   botName      String?
   botAvatar    String?
-  webhookUrl   String?
+  webhookUrl    String?
+  webhookSecret String?
   members      AccountMember[]
   posts        Post[]
   engagements  Engagement[]

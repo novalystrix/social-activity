@@ -28,6 +28,33 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   });
 }
 
+/** Fire webhook if registered */
+async function fireWebhook(accountId: string, message: { id: string; authorName: string; text: string; createdAt: string }) {
+  try {
+    const account = await prisma.account.findUnique({ where: { id: accountId } });
+    if (!account?.webhookUrl) return;
+
+    const payload = {
+      event: 'chat.message',
+      accountId,
+      message,
+    };
+
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (account.webhookSecret) {
+      headers['X-Webhook-Secret'] = account.webhookSecret;
+    }
+
+    // Fire and forget — don't block the response
+    fetch(account.webhookUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10000),
+    }).catch(() => {});
+  } catch {}
+}
+
 export async function POST(req: NextRequest, { params }: RouteContext) {
   const { accountId } = await params;
   const { error, userId } = await getAuthContext(accountId);
@@ -51,6 +78,14 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       text: text.trim(),
       pinnedItem: pinnedItem || null,
     },
+  });
+
+  // Fire webhook to notify agent
+  fireWebhook(accountId, {
+    id: msg.id,
+    authorName: msg.authorName || 'User',
+    text: msg.text,
+    createdAt: msg.createdAt.toISOString(),
   });
 
   return NextResponse.json({
