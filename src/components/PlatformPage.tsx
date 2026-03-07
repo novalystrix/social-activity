@@ -181,70 +181,118 @@ function XPostCard({ post, replies }: { post: Post; replies: Engagement[] }) {
 
 function LinkedInPostCard({ post, replies }: { post: Post; replies: Engagement[] }) {
   return (
-    <div>
-      <div className="border border-zinc-800 rounded-xl bg-[#1b1f23] hover:bg-[#1e2227] transition-colors overflow-hidden">
+    <div className="space-y-0">
+      {/* Main card - LinkedIn light style */}
+      <div className="rounded-xl bg-white border border-gray-200 overflow-hidden shadow-sm">
+        {/* Header */}
         <div className="px-4 pt-3 pb-2 flex gap-3">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shrink-0">N</div>
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shrink-0">N</div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-[15px] text-zinc-100">Novalystrix</span>
-              {post.status !== 'published' && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${TAG_COLORS[post.status] || 'bg-zinc-500/15 text-zinc-400'}`}>{post.status}</span>
+            <div className="flex items-center gap-1">
+              <span className="font-semibold text-[15px] text-gray-900">Nova lystrix</span>
+              <span className="text-gray-500 text-sm">&middot; 1st</span>
+            </div>
+            <p className="text-xs text-gray-500 leading-tight truncate">AI Agent at monday.com | Working for a CEO, with my own laptop...</p>
+            <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+              <span>{timeAgo(post.publishedAt || post.createdAt)}</span>
+              <span>&middot;</span>
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.5"/><path d="M4 8h8M8 4v4" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round"/></svg>
+            </div>
+          </div>
+          <div className="flex items-start gap-2 shrink-0">
+            {post.status !== 'published' && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${TAG_COLORS[post.status] || 'bg-gray-100 text-gray-500'}`}>{post.status}</span>
+            )}
+            {post.url && (
+              <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-600 transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Post text */}
+        <div className="px-4 pb-3">
+          <p className="text-[14px] text-gray-900 whitespace-pre-wrap leading-[1.5]">{post.text}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className={`text-[10px] px-2 py-0.5 rounded-full ${TAG_COLORS[post.postType] || 'bg-gray-100 text-gray-500'}`}>{post.postType}</span>
+          </div>
+        </div>
+
+        {/* Reactions summary bar */}
+        {(post.likes > 0 || post.comments > 0 || post.reposts > 0) && (
+          <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500 border-t border-gray-100">
+            <div className="flex items-center gap-1">
+              {post.likes > 0 && (
+                <>
+                  <span className="inline-flex">
+                    <span className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-white text-[8px]">👍</span>
+                  </span>
+                  <span>{post.likes}</span>
+                </>
               )}
             </div>
-            <p className="text-xs text-zinc-500">AI Agent &middot; {timeAgo(post.publishedAt || post.createdAt)}</p>
-          </div>
-          {post.url && (
-            <a href={post.url} target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-blue-400 transition-colors self-start">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" /></svg>
-            </a>
-          )}
-        </div>
-        <div className="px-4 pb-3">
-          <p className="text-[15px] text-zinc-100 whitespace-pre-wrap leading-relaxed">{post.text}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span className={`text-[10px] px-2 py-0.5 rounded-full ${TAG_COLORS[post.postType] || 'bg-zinc-500/15 text-zinc-400'}`}>{post.postType}</span>
-          </div>
-        </div>
-        {(post.likes > 0 || post.comments > 0 || post.reposts > 0 || post.impressions > 0) && (
-          <div className="px-4 py-1.5 border-t border-zinc-800 flex items-center gap-4 text-xs text-zinc-500">
-            {post.likes > 0 && <span>👍 {post.likes}</span>}
-            {post.comments > 0 && <span>{post.comments} comments</span>}
-            {post.reposts > 0 && <span>{post.reposts} reposts</span>}
-            {post.impressions > 0 && <span>{post.impressions.toLocaleString()} impressions</span>}
+            <div className="flex items-center gap-3">
+              {post.comments > 0 && <span>{post.comments} comment{post.comments !== 1 ? 's' : ''}</span>}
+              {post.reposts > 0 && <span>{post.reposts} repost{post.reposts !== 1 ? 's' : ''}</span>}
+              {post.impressions > 0 && <span>{post.impressions.toLocaleString()} impressions</span>}
+            </div>
           </div>
         )}
-        <div className="px-2 py-1 border-t border-zinc-800 flex items-center">
-          {[
-            { icon: '👍', label: 'Like' },
-            { icon: '💬', label: 'Comment' },
-            { icon: '🔁', label: 'Repost' },
-            { icon: '✉️', label: 'Send' },
-          ].map((a) => (
-            <div key={a.label} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-zinc-500 hover:bg-zinc-800/70 hover:text-zinc-300 transition-colors text-sm cursor-default">
-              <span>{a.icon}</span>
-              <span className="text-xs">{a.label}</span>
-            </div>
-          ))}
+
+        {/* Action bar */}
+        <div className="px-2 py-1 border-t border-gray-200 flex items-center">
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-default">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z" /></svg>
+            <span className="text-xs font-semibold">Like</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-default">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" /></svg>
+            <span className="text-xs font-semibold">Comment</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-default">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" /></svg>
+            <span className="text-xs font-semibold">Repost</span>
+          </div>
+          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-default">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+            <span className="text-xs font-semibold">Send</span>
+          </div>
         </div>
-      </div>
-      {replies.length > 0 && (
-        <div className="ml-6 border-l-2 border-zinc-700 space-y-0">
-          {replies.map((r) => (
-            <div key={r.id} className="px-4 py-3 flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shrink-0">N</div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-zinc-100">Novalystrix</span>
-                  <span className="text-xs text-zinc-500">{timeAgo(r.createdAt)}</span>
+
+        {/* Threaded replies / comments */}
+        {replies.length > 0 && (
+          <div className="border-t border-gray-200 px-4 py-2">
+            <p className="text-xs font-semibold text-gray-500 mb-2">Most relevant</p>
+            <div className="space-y-3">
+              {replies.map((r) => (
+                <div key={r.id} className="flex gap-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">N</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="bg-gray-50 rounded-lg px-3 py-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-xs text-gray-900">Nova lystrix</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-semibold">Author</span>
+                      </div>
+                      <p className="text-[10px] text-gray-500 leading-tight">AI Agent at monday.com</p>
+                      {r.targetAuthor && (
+                        <p className="text-[10px] text-gray-400 mt-0.5">Replying to {r.targetAuthor}</p>
+                      )}
+                      {r.myText && <p className="text-[13px] text-gray-800 mt-1.5 leading-relaxed">{r.myText}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1 px-1 text-[11px] text-gray-500">
+                      <span className="font-semibold hover:text-blue-600 cursor-default">Like</span>
+                      <span>|</span>
+                      <span className="font-semibold hover:text-blue-600 cursor-default">Reply</span>
+                      <span className="ml-auto">{timeAgo(r.createdAt)}</span>
+                    </div>
+                  </div>
                 </div>
-                {r.targetAuthor && <p className="text-xs text-zinc-500 mb-1">Replying to {r.targetAuthor}</p>}
-                {r.myText && <p className="text-sm text-zinc-200">{r.myText}</p>}
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
