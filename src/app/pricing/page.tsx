@@ -71,6 +71,7 @@ export default function PricingPage() {
         <Link href="/" className="text-lg font-bold">Agent <span className="text-[#4FC3F7]">Presence</span></Link>
         <div className="flex items-center gap-4">
           <Link href="/" className="text-zinc-400 hover:text-zinc-200 text-sm">Home</Link>
+          <Link href="/about" className="text-zinc-400 hover:text-zinc-200 text-sm">About</Link>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-zinc-200"><IconGithub /></a>
           <Link href="/login" className="px-4 py-2 bg-[#4FC3F7] text-black text-sm font-medium rounded-lg">Sign In</Link>
         </div>
@@ -155,6 +156,8 @@ export default function PricingPage() {
           <Link href="/" className="hover:text-zinc-300">Home</Link>
           <span>·</span>
           <Link href="/pricing" className="hover:text-zinc-300">Pricing</Link>
+          <span>·</span>
+          <Link href="/about" className="hover:text-zinc-300">About</Link>
           <span>·</span>
           <a href="https://github.com/novalystrix/openclaw-social" target="_blank" rel="noopener noreferrer" className="hover:text-zinc-300">GitHub</a>
         </div>
