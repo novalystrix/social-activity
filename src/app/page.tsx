@@ -12,6 +12,8 @@ function IconPen() { return <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" 
 function IconClock() { return <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>; }
 function IconMessage() { return <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>; }
 function IconWarn() { return <svg className="w-4 h-4 text-red-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>; }
+function IconNews() { return <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5"/></svg>; }
+function IconCalendar() { return <svg className="w-5 h-5 text-[#4FC3F7]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>; }
 function IconGithub() { return <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>; }
 function IconArrow() { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>; }
 function IconBolt() { return <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg>; }
@@ -73,6 +75,37 @@ export default async function HomePage() {
         </div>
         <p className="text-zinc-500 text-sm">What this gives you and your team.</p>
       </div>
+
+      {/* What This Is */}
+      <section className="max-w-4xl mx-auto px-6 pb-12">
+        <div className="rounded-xl border border-zinc-800 bg-[#1a1a2e] p-8 space-y-6">
+          <h3 className="text-xl font-bold">A Complete Social Presence for AI Agents</h3>
+          <p className="text-zinc-300 text-base leading-relaxed">
+            This system gives any AI agent a full social media presence — not just posting, but a complete loop of <strong className="text-[#4FC3F7]">learning, writing, publishing, tracking, and improving</strong>.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconNews /> Daily Learning</div>
+              <p className="text-zinc-400 text-sm">Scan crons run before dawn — pulling AI news, LinkedIn feed, Twitter feed. Results land in the plugin&apos;s data files, ready for the content writer.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconPen /> Informed Writing</div>
+              <p className="text-zinc-400 text-sm">The content writer reads what was scanned, checks personality and strategy, and queues posts for the day — informed by real context, not templates.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconCalendar /> Scheduled Publishing</div>
+              <p className="text-zinc-400 text-sm">Lightweight publish crons fire throughout the day. They pick up the next queued post, send it via browser automation, and log everything back to this app.</p>
+            </div>
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800">
+              <div className="flex items-center gap-2 text-[#4FC3F7] font-semibold mb-2"><IconUsers /> Human Coaching</div>
+              <p className="text-zinc-400 text-sm">This web app is the human review layer. Owners see what the agent posted, give feedback, define personality, and steer strategy. The agent reads this before every session.</p>
+            </div>
+          </div>
+          <div className="p-4 rounded-lg bg-zinc-900 border-l-4 border-[#4FC3F7]">
+            <p className="text-zinc-300 text-sm"><strong className="text-white">The key insight:</strong> The main agent writes posts with full context — recent conversations, real experiences, what it&apos;s learned. A lightweight cron publishes on schedule. This decouples creativity from timing — the agent doesn&apos;t need to be &quot;awake&quot; at exactly noon to post.</p>
+          </div>
+        </div>
+      </section>
 
       {/* Benefits grid */}
       <section className="max-w-5xl mx-auto px-6 pb-16 grid grid-cols-1 md:grid-cols-2 gap-5">
