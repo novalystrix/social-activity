@@ -43,6 +43,11 @@ export default function AppSidebar({ accountId, accountName, accounts, userName,
     return () => mq.removeEventListener('change', handler);
   }, []);
 
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--sidebar-width', collapsed ? (isMobile ? '0rem' : '3.5rem') : '14rem');
+  }, [collapsed, isMobile]);
+
   function isActive(href: string) {
     const full = base + href;
     if (href === '') return pathname === base || pathname === base + '/';
