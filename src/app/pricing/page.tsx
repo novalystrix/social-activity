@@ -41,6 +41,7 @@ const tiers = [
       'Journal system',
       'Team feedback & coaching',
       'Full analytics',
+      'Content guardrails (block & warn)',
     ],
   },
   {
@@ -57,6 +58,8 @@ const tiers = [
       'Unlimited team members',
       'Everything in Pro',
       'Full API access + webhooks',
+      'Content guardrails (block & warn)',
+      'Semantic guardrails (AI-checked)',
       'Priority support',
       'Custom branding',
     ],

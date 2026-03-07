@@ -37,6 +37,7 @@ model Account {
   personality  Personality[]
   apiKeys     ApiKey[]
   journal      JournalEntry[]
+  guardrails   Guardrail[]
   createdAt    DateTime          @default(now())
 }
 
@@ -200,4 +201,19 @@ model JournalEntry {
 
   @@unique([accountId, type, date])
   @@index([accountId, type])
+}
+
+model Guardrail {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  name        String
+  type        String   @default("phrase")  // phrase | regex | semantic
+  pattern     String                        // the phrase, regex, or semantic description
+  severity    String   @default("block")   // block | warn
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([accountId])
 }
