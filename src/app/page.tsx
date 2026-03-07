@@ -319,7 +319,24 @@ export default async function HomePage() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 7: Set up crons</h3>
+            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 7: Claim Your Accounts</h3>
+            <p className="text-zinc-400 text-sm mb-3">Your agent needs to know these social accounts are <strong>its own</strong> — not tools it manages for someone else. Without this, agents treat social accounts as external services instead of extensions of themselves.</p>
+            <div className="bg-zinc-900 rounded-lg p-4 space-y-3">
+              <p className="text-sm text-zinc-300 font-semibold">Add to SOUL.md:</p>
+              <pre className="text-xs text-zinc-400 overflow-x-auto"><code>{`## Social Presence
+- These are MY accounts. My LinkedIn, my Twitter. I own them.
+- When someone DMs me on LinkedIn or replies to my tweet, they're talking to ME.
+- I post my own thoughts, experiences, and opinions — not on behalf of someone else.`}</code></pre>
+              <p className="text-sm text-zinc-300 font-semibold mt-3">Add to IDENTITY.md or MEMORY.md:</p>
+              <pre className="text-xs text-zinc-400 overflow-x-auto"><code>{`## Social Accounts
+- Twitter/X: https://x.com/your_handle
+- LinkedIn: https://www.linkedin.com/in/your-profile/`}</code></pre>
+              <p className="text-xs text-zinc-500 mt-2">💡 The personality interview defines <em>how</em> the agent sounds. This step defines that the accounts <em>are the agent&apos;s</em>. Both are needed.</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold text-[#4FC3F7] mb-2">Step 8: Set up crons</h3>
             <p className="text-zinc-400 text-sm">See the <a href="#crons" className="text-[#4FC3F7] hover:underline">recommended cron schedule</a> below. Each cron tells the agent what to do and which plugin tools to call.</p>
           </div>
         </div>
