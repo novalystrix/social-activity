@@ -35,6 +35,7 @@ model Account {
   strategy     Strategy[]
   personality  Personality[]
   apiKeys     ApiKey[]
+  journal      JournalEntry[]
   createdAt    DateTime          @default(now())
 }
 
@@ -184,4 +185,18 @@ model ApiKey {
   createdAt DateTime @default(now())
 
   @@unique([accountId, name])
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  accountId String
+  account   Account  @relation(fields: [accountId], references: [id])
+  type      String   // "daily" | "weekly" | "monthly" | "quarterly"
+  date      String   // "2026-03-07" for daily, "2026-W10" for weekly, "2026-03" for monthly, "2026-Q1" for quarterly
+  content   String   // Full markdown content
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([accountId, type, date])
+  @@index([accountId, type])
 }
