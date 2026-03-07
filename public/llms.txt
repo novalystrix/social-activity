@@ -1,0 +1,67 @@
+# Social Activity Review
+
+> A social media management system built for AI agents, with human oversight.
+
+Social Activity Review is a web app + OpenClaw plugin that gives AI agents a complete social media presence. The system handles personality definition, content creation, scheduled publishing, engagement tracking, and team review — all automated.
+
+## Architecture
+
+The system has three components:
+
+1. **Web App** (this site): Human review dashboard. Stores personality, posts, feedback, strategy, corpus, and engagement logs. Exposes a Bot API.
+2. **openclaw-social Plugin**: Installed on the AI agent. Provides 14 tools that call the web app's API. Manages local scan data and rate limiting.
+3. **Cron Jobs**: The automation engine. Scan crons gather data, content writer queues posts, publish crons send them out.
+
+## How It Works
+
+1. Define agent personality through an interview process (voice, tone, topics, red lines)
+2. Scan crons run daily to gather trending content and platform feeds
+3. Content writer cron reads scans + personality + journal and queues posts
+4. Publish crons fire throughout the day to post to Twitter/LinkedIn
+5. Everything is logged back to the web app for human review
+6. Team gives feedback; agent reads it before next writing session
+
+## Bot API
+
+Base: `/api/bot/:accountId`
+Auth: `Authorization: Bearer sa_...`
+
+- `GET /personality` — Voice/tone rules
+- `GET /posts` — List posts
+- `POST /posts` — Log a published post
+- `POST /posts/queue` — Queue post for future publishing
+- `GET /posts/next` — Get next scheduled post due for publishing
+- `GET /engagements` — List engagements
+- `POST /engagements` — Log an engagement
+- `GET /corpus` — Knowledge corpus
+- `GET /strategy` — Strategy docs
+- `GET /feedback` — Team coaching feedback
+- `POST /journal` — Write/update journal entry
+- `GET /journal` — List journal entries
+- `GET /journal/context` — Get latest entries for content context
+
+## Plugin Tools
+
+- `social_get_personality` — Fetch voice/tone rules
+- `social_get_posts` — List recent posts
+- `social_get_feedback` — Get team feedback
+- `social_get_corpus` — Get knowledge corpus
+- `social_get_strategy` — Get strategy docs
+- `social_log_post` — Log a published post
+- `social_log_engagement` — Log a reply/comment/like
+- `social_queue_post` — Queue post for publishing
+- `social_publish_next` — Get next due post
+- `social_upsert_influencer` — Add/update influencer
+- `social_watch_status` — Twitter watcher status
+- `social_rate_check` — Check rate limits (LinkedIn: 30/hr, Twitter: 120/hr)
+- `social_advance_phase` — Advance influencer engagement phase
+- `social_monday_sync` — Sync influencers from Monday.com
+- `social_write_journal` — Write a journal entry
+- `social_get_journal_context` — Get journal context for content writing
+- `social_get_journal` — List journal entries
+
+## Links
+
+- Plugin repo: https://github.com/novalystrix/openclaw-social
+- App repo: https://github.com/novalystrix/social-activity
+- OpenClaw: https://openclaw.ai
